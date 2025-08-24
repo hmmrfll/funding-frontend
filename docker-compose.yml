@@ -1,0 +1,8 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ${FRONTEND_CONTAINER_NAME:-frontend-container}
+    ports:
+      - "${FRONTEND_PORT_LOCAL}:5173"
