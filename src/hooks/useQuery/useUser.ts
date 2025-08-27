@@ -1,18 +1,18 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { createUser, getUser, updateUser } from '../../service/shared';
-import type { IUser, UserData } from '../../types/IUser';
+import { getCurrentUser, updateUser } from '../../service/shared';
+import type { IUser } from '../../types/IUser';
 import useTelegram from '../useTelegram';
 
-export const useUser = ({ id }: { id?: string } = {}) => {
-	const { user } = useTelegram();
-	const userId = id || user?.id || '';
+export const useUser = () => {
+	const { user: telegramUser } = useTelegram();
 
 	const query = useQuery<IUser>({
-		queryKey: ['user', String(userId)],
-		queryFn: () => getUser(userId),
-		staleTime: 1000 * 60 * 5, // Данные актуальны в течение 5 минут
-		gcTime: 1000 * 60 * 10, // Кэш удаляется через 10 минут
-		retry: false,
+		queryKey: ['user', 'me'],
+		queryFn: getCurrentUser,
+		staleTime: 1000 * 60 * 5, // 5 минут
+		gcTime: 1000 * 60 * 10, // 10 минут
+		retry: 1,
+		enabled: !!telegramUser, // Выполняем только если есть telegram пользователь
 	});
 
 	return {
@@ -23,14 +23,8 @@ export const useUser = ({ id }: { id?: string } = {}) => {
 
 export const useUserActions = () => {
 	const queryClient = useQueryClient();
-	const createMutation = useMutation<IUser, Error, UserData & { referrerPartnerId?: string }>({
-		mutationFn: createUser,
-		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ['user'] });
-		},
-	});
 
-	const updateMutation = useMutation<IUser, Error, FormData>({
+	const updateMutation = useMutation<IUser, Error, Partial<IUser>>({
 		mutationFn: updateUser,
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['user'] });
@@ -38,9 +32,8 @@ export const useUserActions = () => {
 	});
 
 	return {
-		createUser: createMutation.mutateAsync,
 		updateUser: updateMutation.mutateAsync,
-		isLoading: createMutation.isPending || updateMutation.isPending,
-		error: createMutation.error || updateMutation.error,
+		isLoading: updateMutation.isPending,
+		error: updateMutation.error,
 	};
 };

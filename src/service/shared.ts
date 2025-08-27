@@ -1,11 +1,9 @@
-import type { IUser } from '../types/IUser';
+import type { IUser, UserUpdateData } from '../types/IUser';
 import type { UserData } from '../types/IUser';
 import fetchWithAuth from './fetchWithAuth';
 
-export const getUser = (id: string): Promise<IUser> => {
-	console.log(id);
-	// return mockGetUser();
-	return fetchWithAuth(`/user/${id}`);
+export const getCurrentUser = (): Promise<IUser> => {
+	return fetchWithAuth('/user/me');
 };
 
 export const getUserByCode = (userCode: string): Promise<IUser> => {
@@ -23,11 +21,9 @@ export const createUser = (data: UserData): Promise<IUser> => {
 	});
 };
 
-export const updateUser = (data: FormData): Promise<IUser> => {
-	// return mockUpdateUser(data);
+export const updateUser = (data: UserUpdateData): Promise<IUser> => {
 	return fetchWithAuth('/user', {
 		method: 'PUT',
-		body: data,
+		body: JSON.stringify(data),
 	});
 };
-

@@ -4,6 +4,8 @@ const useTelegram = () => {
 	const webApp = window.Telegram?.WebApp;
 	const user = webApp?.initDataUnsafe?.user;
 
+	const isTelegramEnvironment = !!webApp?.initData;
+
 	const isCurTelegramUser = (userId: string) => {
 		return String(userId) === String(user?.id);
 	};
@@ -17,8 +19,7 @@ const useTelegram = () => {
 		if (webApp?.openLink) {
 			webApp.openLink(url, { try_instant_view: true });
 		} else {
-			// fallback если не в Telegram
-			window.open(url);
+			window.open(url, '_blank');
 		}
 	};
 
@@ -48,7 +49,7 @@ const useTelegram = () => {
 					const phone = event.responseUnsafe?.contact?.phone_number || null;
 					resolve(phone);
 				} else if (event.status === 'cancelled') {
-					resolve(null); // пользователь отменил — вернём null
+					resolve(null);
 				}
 			};
 
@@ -71,8 +72,8 @@ const useTelegram = () => {
 
 			const handler = (data: { data: string }) => {
 				resolve(data.data);
-				webApp.closeScanQrPopup(); // Закрыть сканер
-				webApp.offEvent('qrTextReceived', handler); // Удалить слушатель
+				webApp.closeScanQrPopup();
+				webApp.offEvent('qrTextReceived', handler);
 			};
 
 			webApp.onEvent('qrTextReceived', handler);
@@ -84,8 +85,8 @@ const useTelegram = () => {
 	};
 
 	return {
-		user,
-		theme: webApp?.themeParams?.bg_color == '#ffffff' ? 'light' : 'dark',
+		user: isTelegramEnvironment ? user : null,
+		theme: webApp?.themeParams?.bg_color === '#ffffff' ? 'light' : 'dark',
 		hapticTrigger,
 		hapticNotify,
 		isCurTelegramUser,
@@ -93,7 +94,8 @@ const useTelegram = () => {
 		requestPhoneFromTelegram,
 		onEvent,
 		showScanQR,
-		startParam: webApp?.initDataUnsafe?.start_param
+		startParam: webApp?.initDataUnsafe?.start_param,
+		isTelegramEnvironment,
 	};
 };
 

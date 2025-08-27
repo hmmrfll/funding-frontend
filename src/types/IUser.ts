@@ -1,14 +1,22 @@
 export interface IUser {
     id: string;
-    fullName: string;
-    avatarUrl: string;
-    dateBirth: string;
-    phone: string;
-    company?: string;
-    bonusCount: number;
-    role: UserRole;
-    userCode: string;
+    telegramId: string;
+    name: string;
+    avatarUrl?: string;
+    hasExtendedKeys: boolean;
+    hasHyperliquidKeys: boolean;
+    createdAt: string;
+    updatedAt: string;
 }
+
+export type UserUpdateData = {
+    name?: string;
+    avatarUrl?: string;
+    extendedApiKey?: string;
+    extendedApiSecret?: string;
+    hyperliquidApiKey?: string;
+    hyperliquidApiSecret?: string;
+};
 
 export type UserRole = 'user' | 'admin';
 

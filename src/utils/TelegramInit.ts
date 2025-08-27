@@ -2,12 +2,15 @@ import { isMobile } from './isMobile';
 
 export const TelegramInit = () => {
 	const webApp = window.Telegram?.WebApp;
-	if (!webApp) return;
+
+	if (!webApp) {
+		console.warn('Not running in Telegram WebApp environment');
+		return;
+	}
 
 	webApp.expand();
 	webApp.disableVerticalSwipes();
 
-	// Безопасно вызываем только если метод существует
 	if (isMobile && typeof webApp.requestFullscreen === 'function') {
 		try {
 			webApp.requestFullscreen();

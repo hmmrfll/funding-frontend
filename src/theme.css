@@ -1,19 +1,18 @@
 @theme {
-
 	--font-onest: 'Onest', sans-serif;
-	/* Colors */
-	--color-primary-500: rgba(47, 171, 43, 1);
-	--color-gray-dark: rgba(17, 17, 17, 1);
-	--color-gray-800: rgba(30, 31, 32, 1);
-    --color-gray-500: rgba(243, 245, 247, 1);
+
+	--color-bg: rgba(255, 255, 255, 1);
+	--color-bg-secondary: rgba(249, 250, 251, 1);
+	--color-text: rgba(15, 20, 25, 1);
+	--color-text-secondary: rgba(107, 114, 128, 1);
+	--color-border: rgba(229, 231, 235, 1);
+	--color-surface: rgba(255, 255, 255, 1);
+
+	--color-primary: rgba(47, 171, 43, 1);
+	--color-error: rgba(235, 26, 53, 1);
+	--color-warning: rgba(245, 158, 11, 1);
 	--color-white: rgba(255, 255, 255, 1);
-	--color-black: rgba(15, 20, 25, 1);
-	--color-red-500: rgba(235, 26, 53, 1);
-	
 
-
-
-	/* Width */
 	--width-container: 1400px;
 	--max-width-container: 750px;
 }
