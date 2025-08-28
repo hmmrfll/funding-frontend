@@ -1,0 +1,94 @@
+:root {
+	--font-weight-regular: 400;
+	--font-weight-semibold: 600;
+
+	--font-size-primary: 28px;
+	--line-height-primary: 36px;
+
+	--font-size-secondary: 22px;
+	--line-height-secondary: 28px;
+
+	--font-size-tertiary: 17px;
+	--line-height-tertiary: 24px;
+
+	--font-size-quaternary: 15px;
+	--line-height-quaternary: 20px;
+
+	--font-size-quinary: 13px;
+	--line-height-quinary: 16px;
+
+	--font-size-senary: 11px;
+	--line-height-senary: 16px;
+}
+
+.font-primary-bold {
+	font-weight: var(--font-weight-semibold);
+	font-size: var(--font-size-primary);
+	line-height: var(--line-height-primary);
+}
+
+.font-secondary-bold {
+	font-weight: var(--font-weight-semibold);
+	font-size: var(--font-size-secondary);
+	line-height: var(--line-height-secondary);
+}
+
+.font-tertiary-bold {
+	font-weight: var(--font-weight-semibold);
+	font-size: var(--font-size-tertiary);
+	line-height: var(--font-size-tertiary);
+}
+
+.font-quaternary-bold {
+	font-weight: var(--font-weight-semibold);
+	font-size: var(--font-size-quaternary);
+	line-height: var(--font-size-quaternary);
+}
+
+.font-quinary-bold {
+	font-weight: var(--font-weight-semibold);
+	font-size: var(--font-size-quinary);
+	line-height: var(--font-size-quinary);
+}
+
+.font-senary-bold {
+	font-weight: var(--font-weight-semibold);
+	font-size: var(--font-size-senary);
+	line-height: var(--font-size-senary);
+}
+
+.font-primary-regular {
+	font-weight: var(--font-weight-regular);
+	font-size: var(--font-size-primary);
+	line-height: var(--font-size-primary);
+}
+
+.font-secondary-regular {
+	font-weight: var(--font-weight-regular);
+	font-size: var(--font-size-secondary);
+	line-height: var(--font-size-secondary);
+}
+
+.font-tertiary-regular {
+	font-weight: var(--font-weight-regular);
+	font-size: var(--font-size-tertiary);
+	line-height: var(--font-size-tertiary);
+}
+
+.font-quaternary-regular {
+	font-weight: var(--font-weight-regular);
+	font-size: var(--font-size-quaternary);
+	line-height: var(--font-size-quaternary);
+}
+
+.font-quinary-regular {
+	font-weight: var(--font-weight-regular);
+	font-size: var(--font-size-quinary);
+	line-height: var(--font-size-quinary);
+}
+
+.font-senary-regular {
+	font-weight: var(--font-weight-regular);
+	font-size: var(--font-size-senary);
+	line-height: var(--font-size-senary);
+}

@@ -2,9 +2,10 @@
 	--font-onest: 'Onest', sans-serif;
 
 	--color-bg: rgba(255, 255, 255, 1);
-	--color-bg-secondary: rgba(249, 250, 251, 1);
+	--color-bg-secondary: rgba(243, 245, 247, 1);
 	--color-text: rgba(15, 20, 25, 1);
 	--color-text-secondary: rgba(107, 114, 128, 1);
+	--color-text-tertiary: rgba(255, 255, 255, 0.64);
 	--color-border: rgba(229, 231, 235, 1);
 	--color-surface: rgba(255, 255, 255, 1);
 

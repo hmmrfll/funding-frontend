@@ -20,6 +20,7 @@ const UserProfileBlock = () => {
 		if (user.hasExtendedKeys || user.hasHyperliquidKeys) return 'warning';
 		return 'error';
 	};
+
 	const getBlockContent = () => {
 		if (isLoading) {
 			return {
@@ -113,7 +114,7 @@ const UserProfileBlock = () => {
 			<div className={`flex items-center space-x-3 ${fullScreenPaddingTop}`}>
 				<div className={content.iconClassName}>{content.icon}</div>
 
-				<div className="flex-1 min-w-0 flex flex-col">
+				<div className="flex-1 min-w-0 flex flex-col h-full justify-center gap-[2px]">
 					{content.isLoading ? (
 						<>
 							<Skeleton
@@ -132,8 +133,8 @@ const UserProfileBlock = () => {
 						</>
 					) : (
 						<>
-							<span className="text-[16px] leading-6">{content.title}</span>
-							<span className="text-sm text-black/60 dark:text-white/60">{content.subtitle}</span>
+							<span className="font-quaternary-regular text-[var(--color-text)]">{content.title}</span>
+							<span className="font-quaternary-regular text-[var(--color-text-tertiary)]">{content.subtitle}</span>
 						</>
 					)}
 				</div>
