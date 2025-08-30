@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import useTelegram from './hooks/useTelegram';
 import HomePage from './pages/HomePage';
 import AuthPage from './pages/AuthPage';
+import PairDetailsPage from './pages/PairDetailsPage';
 
 function App() {
 	const { theme } = useTelegram();
@@ -42,6 +43,10 @@ const AppRoutes = () => {
 			<Route
 				path="/auth/:sessionId"
 				element={<AuthPage />}
+			/>
+			<Route
+				path="/pair/:symbol"
+				element={<PairDetailsPage />}
 			/>
 			<Route
 				path="/register"
