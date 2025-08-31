@@ -2,6 +2,7 @@ import React from 'react';
 import UserProfileBlock from '../blocs/UserProfileBlock';
 import DashboardBlock from '../blocs/WidgetsBlock';
 import PairDetailsBlock from '../blocs/PairDetailsBlock';
+import FooterBlock from '../blocs/FooterBlock';
 
 const HomePage: React.FC = () => {
 	return (
@@ -9,6 +10,7 @@ const HomePage: React.FC = () => {
 			<UserProfileBlock />
 			<DashboardBlock />
 			<PairDetailsBlock />
+			<FooterBlock />
 		</div>
 	);
 };
