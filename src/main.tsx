@@ -4,6 +4,7 @@ import App from './App.tsx';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from './providers/AuthProvider';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { BackButtonHandler } from './components/BackButtonHandler';
 
 const queryClient = new QueryClient({
 	defaultOptions: {
@@ -18,6 +19,7 @@ createRoot(document.getElementById('root')!).render(
 		<QueryClientProvider client={queryClient}>
 			<AuthProvider>
 				<App />
+				<BackButtonHandler />
 			</AuthProvider>
 		</QueryClientProvider>
 	</BrowserRouter>,

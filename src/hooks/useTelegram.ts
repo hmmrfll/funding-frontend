@@ -1,10 +1,35 @@
+import { useEffect, useState } from 'react';
 import type { HapticFeedbackType } from '../telegram';
+import { useTelegramStorage } from '../utils/TelegramStorage';
 
 const useTelegram = () => {
-	const webApp = window.Telegram?.WebApp;
-	const user = webApp?.initDataUnsafe?.user;
+	const [restoredUser, setRestoredUser] = useState<any>(null);
+	const [isDataRestored, setIsDataRestored] = useState(false);
+	const { getInitData, isCloudStorageAvailable } = useTelegramStorage();
 
-	const isTelegramEnvironment = !!webApp?.initData;
+	const webApp = window.Telegram?.WebApp;
+	const user = webApp?.initDataUnsafe?.user || restoredUser;
+
+	const isTelegramEnvironment = !!webApp?.initData || !!restoredUser;
+
+	useEffect(() => {
+		const restoreInitData = async () => {
+			if (!webApp?.initData && isCloudStorageAvailable()) {
+				try {
+					const storedInitData = await getInitData();
+					if (storedInitData?.user) {
+						setRestoredUser(storedInitData.user);
+						console.log('Init data restored from CloudStorage');
+					}
+				} catch (error) {
+					console.warn('Failed to restore init data:', error);
+				}
+			}
+			setIsDataRestored(true);
+		};
+
+		restoreInitData();
+	}, [webApp?.initData, getInitData, isCloudStorageAvailable]);
 
 	const isCurTelegramUser = (userId: string) => {
 		return String(userId) === String(user?.id);
@@ -96,6 +121,7 @@ const useTelegram = () => {
 		showScanQR,
 		startParam: webApp?.initDataUnsafe?.start_param,
 		isTelegramEnvironment,
+		isDataRestored,
 	};
 };
 

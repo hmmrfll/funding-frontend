@@ -1,8 +1,6 @@
 import { Route, Routes } from 'react-router-dom';
 import './index.css';
 
-import { BackButtonHandler } from './components/BackButtonHandler';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import useTelegram from './hooks/useTelegram';
 import HomePage from './pages/HomePage';
 import AuthPage from './pages/AuthPage';
@@ -11,23 +9,12 @@ import PairDetailsPage from './pages/PairDetailsPage';
 function App() {
 	const { theme } = useTelegram();
 
-	const queryClient = new QueryClient({
-		defaultOptions: {
-			queries: {
-				retry: 3,
-			},
-		},
-	});
-
 	return (
-		<QueryClientProvider client={queryClient}>
-			<main className={theme}>
-				<div className="container p-[24px]">
-					<AppRoutes />
-				</div>
-			</main>
-			<BackButtonHandler />
-		</QueryClientProvider>
+		<main className={theme}>
+			<div className="container p-[24px]">
+				<AppRoutes />
+			</div>
+		</main>
 	);
 }
 
