@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useBackButton } from '../hooks/useBackButton';
+import { navigateBack } from '../utils/navigationUtils';
 import SquircleWrap from '../components/SquircleWrap';
 import CurrentRatesCard from '../components/CurrentRatesCard';
 import ProfitCalculator from '../components/ProfitCalculator';
@@ -19,7 +20,7 @@ const PairDetailsPage: React.FC = () => {
 	const [refreshing, setRefreshing] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
-	useBackButton(() => navigate('/'));
+	useBackButton(() => navigateBack(navigate));
 
 	const pairSymbol = symbol?.replace('-', '/') || '';
 

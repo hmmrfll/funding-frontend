@@ -2,6 +2,7 @@ import React from 'react';
 import SquircleWrap from './SquircleWrap';
 import ChevronRight from '../assets/ChevronRight.tsx';
 import type { ArbitrageOpportunity } from '../service/arbitrageService';
+import { getProfitPotential } from '../utils/arbitrageUtils';
 
 type PairData = {
 	symbol: string;
@@ -32,11 +33,6 @@ const PairCard: React.FC<Props> = ({ pair, opportunities, onClick, loading = fal
 	const getDirectionIcon = (rate: number | null) => {
 		if (rate === null) return '➖';
 		return rate >= 0 ? '↗️' : '↘️';
-	};
-
-	const getProfitPotential = (opportunities: ArbitrageOpportunity[], symbol: string): number => {
-		const opportunity = opportunities.find((opp) => opp.symbol === symbol);
-		return opportunity ? opportunity.absRateDifference * 100 : 0;
 	};
 
 	const profitPotential = getProfitPotential(opportunities, symbol);

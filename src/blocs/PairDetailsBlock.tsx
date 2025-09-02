@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react';
 import SquircleWrap from '../components/SquircleWrap';
 import PairCard from '../components/PairCard';
 import ActionCard from '../components/ActionCard';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { getFundingRatesComparison } from '../service/arbitrageService';
-import type { FundingRatesComparison, ArbitrageOpportunity } from '../service/arbitrageService';
+import type { FundingRatesComparison } from '../service/arbitrageService';
+import { getProfitPotential, handlePairClick as handlePairClickUtil } from '../utils/arbitrageUtils';
 
 const PairDetailsBlock: React.FC = () => {
 	const navigate = useNavigate();
+	const location = useLocation();
 	const [data, setData] = useState<FundingRatesComparison | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [refreshing, setRefreshing] = useState(false);
@@ -40,7 +42,7 @@ const PairDetailsBlock: React.FC = () => {
 	}, []);
 
 	const handlePairClick = (symbol: string) => {
-		navigate(`/pair/${symbol.replace('/', '-')}`);
+		handlePairClickUtil(symbol, navigate, location.pathname);
 	};
 
 	if (loading && !data) {
@@ -63,6 +65,12 @@ const PairDetailsBlock: React.FC = () => {
 						</SquircleWrap>
 					))}
 				</div>
+				<ActionCard
+					icon="📊"
+					title="View All Pairs"
+					description="Analytics & Historical Data"
+					onClick={() => navigate('/analytics')}
+				/>
 			</div>
 		);
 	}
@@ -82,11 +90,6 @@ const PairDetailsBlock: React.FC = () => {
 	if (!data) {
 		return null;
 	}
-
-	const getProfitPotential = (opportunities: ArbitrageOpportunity[], symbol: string): number => {
-		const opportunity = opportunities.find((opp) => opp.symbol === symbol);
-		return opportunity ? opportunity.absRateDifference * 100 : 0;
-	};
 
 	const topPairs = Object.entries(data.comparison || {})
 		.filter(([_, pair]) => pair && pair.available && pair.available.both)

@@ -5,6 +5,8 @@ import useTelegram from './hooks/useTelegram';
 import HomePage from './pages/HomePage';
 import AuthPage from './pages/AuthPage';
 import PairDetailsPage from './pages/PairDetailsPage';
+import AnalyticsPage from './pages/AnalyticsPage';
+import DashboardsPage from './pages/DashboardsPage';
 
 function App() {
 	const { theme } = useTelegram();
@@ -45,7 +47,11 @@ const AppRoutes = () => {
 			/>
 			<Route
 				path="/analytics"
-				element={<div>Analytics Page</div>}
+				element={<AnalyticsPage />}
+			/>
+			<Route
+				path="/dasboards"
+				element={<DashboardsPage />}
 			/>
 		</Routes>
 	);
