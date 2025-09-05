@@ -21,7 +21,7 @@ const DashboardBlock = () => {
 	};
 
 	const handleNotificationsClick = () => {
-		navigate('/settings');
+		navigate('/settings/notifications');
 	};
 
 	return (

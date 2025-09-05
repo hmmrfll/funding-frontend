@@ -11,7 +11,7 @@ const UserProfileBlock = () => {
 	const navigate = useNavigate();
 
 	const handleClick = () => {
-		navigate('/settings');
+		navigate('/settings/notifications');
 	};
 
 	const getApiKeysStatus = () => {
