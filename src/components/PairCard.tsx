@@ -119,7 +119,7 @@ const PairCard: React.FC<Props> = ({ pair, opportunities, onClick, loading = fal
 				<div className="flex flex-col items-end gap-2">
 					<div className="flex flex-col items-end">
 						<span className="text-xs text-[var(--color-text-tertiary)]">Potential</span>
-						<span className="font-tertiary-bold text-blue-500">~{profitPotential.toFixed(2)}%</span>
+						<span className="font-tertiary-bold text-blue-500">~{profitPotential.toFixed(4)}%</span>
 					</div>
 					<ChevronRight />
 				</div>

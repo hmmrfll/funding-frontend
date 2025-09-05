@@ -17,7 +17,7 @@ const DashboardBlock = () => {
 	}, []);
 
 	const handleArbitrageClick = () => {
-		navigate('/analytics');
+		navigate('/dashboards');
 	};
 
 	const handleNotificationsClick = () => {

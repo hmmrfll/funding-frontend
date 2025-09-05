@@ -50,7 +50,7 @@ const AppRoutes = () => {
 				element={<AnalyticsPage />}
 			/>
 			<Route
-				path="/dasboards"
+				path="/dashboards"
 				element={<DashboardsPage />}
 			/>
 		</Routes>

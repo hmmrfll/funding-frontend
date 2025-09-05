@@ -2,13 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useBackButton } from '../hooks/useBackButton';
 import { navigateBack } from '../utils/navigationUtils';
-import SquircleWrap from '../components/SquircleWrap';
 import CurrentRatesCard from '../components/CurrentRatesCard';
 import ProfitCalculator from '../components/ProfitCalculator';
-import HistoricalChart from '../components/HistoricalChart';
 import StatisticsCard from '../components/StatisticsCard';
 import ActionCard from '../components/ActionCard';
 import ErrorBlock from '../blocs/ErrorBlock';
+import ArbitrageOpportunitiesList from '../components/ArbitrageOpportunitiesList';
 import { getPairDetails } from '../service/arbitrageService';
 import type { PairDetails } from '../service/arbitrageService';
 
@@ -19,6 +18,7 @@ const PairDetailsPage: React.FC = () => {
 	const [loading, setLoading] = useState(true);
 	const [refreshing, setRefreshing] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	const [showOpportunities, setShowOpportunities] = useState(false);
 
 	useBackButton(() => navigateBack(navigate));
 
@@ -57,12 +57,12 @@ const PairDetailsPage: React.FC = () => {
 			<div className="flex flex-col gap-6">
 				<div className="flex items-center justify-between pt-[75px]">
 					<div className="animate-pulse">
-						<div className="h-8 bg-gray-300 rounded w-24 mb-2"></div>
-						<div className="h-4 bg-gray-300 rounded w-48"></div>
+						<div className="h-8 bg-[var(--color-bg-tertiary)] rounded w-24 mb-2"></div>
+						<div className="h-4 bg-[var(--color-bg-tertiary)] rounded w-48"></div>
 					</div>
 					<div className="animate-pulse">
-						<div className="h-4 bg-gray-300 rounded w-20 mb-1"></div>
-						<div className="h-6 bg-gray-300 rounded w-16"></div>
+						<div className="h-4 bg-[var(--color-bg-tertiary)] rounded w-20 mb-1"></div>
+						<div className="h-6 bg-[var(--color-bg-tertiary)] rounded w-16"></div>
 					</div>
 				</div>
 
@@ -78,8 +78,6 @@ const PairDetailsPage: React.FC = () => {
 					profitPotential={0}
 					loading={true}
 				/>
-
-				<HistoricalChart loading={true} />
 
 				<StatisticsCard
 					statistics={{
@@ -125,7 +123,7 @@ const PairDetailsPage: React.FC = () => {
 				</div>
 				<div className="text-right">
 					<div className="text-xs text-[var(--color-text-tertiary)]">Potential Profit</div>
-					<div className="font-tertiary-bold text-blue-500 text-xl">~{profitPotential.toFixed(2)}%</div>
+					<div className="font-tertiary-bold text-blue-500 text-xl">~{profitPotential.toFixed(4)}%</div>
 				</div>
 			</div>
 
@@ -140,8 +138,6 @@ const PairDetailsPage: React.FC = () => {
 				profitPotential={profitPotential}
 			/>
 
-			<HistoricalChart />
-
 			<StatisticsCard statistics={pairData.statistics} />
 
 			<ActionCard
@@ -151,6 +147,28 @@ const PairDetailsPage: React.FC = () => {
 				buttonText="Setup"
 				showChevron={false}
 			/>
+
+			<ActionCard
+				icon="📊"
+				title="View All Opportunities"
+				description="Browse all available arbitrage opportunities"
+				buttonText={showOpportunities ? 'Hide' : 'Show'}
+				showChevron={false}
+				onClick={() => setShowOpportunities(!showOpportunities)}
+			/>
+
+			{showOpportunities && (
+				<div className="space-y-4">
+					<div className="flex items-center justify-between">
+						<h2 className="font-tertiary-bold text-[var(--color-text)] text-lg">Arbitrage Opportunities</h2>
+						<div className="text-sm text-[var(--color-text-tertiary)]">Sorted by profit potential</div>
+					</div>
+					<ArbitrageOpportunitiesList
+						minProfit={0.0001}
+						limit={10}
+					/>
+				</div>
+			)}
 		</div>
 	);
 };

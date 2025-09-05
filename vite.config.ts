@@ -23,6 +23,9 @@ export default defineConfig(({ mode }) => {
 
 	return {
 		plugins: [react(), tailwindcss()],
+		optimizeDeps: {
+			exclude: ['@vite/client', '@vite/env'],
+		},
 		server: {
 			port: parseInt(env.VITE_PORT || '3000'),
 			host: '0.0.0.0',
@@ -30,6 +33,6 @@ export default defineConfig(({ mode }) => {
 		},
 		preview: {
 			port: parseInt(env.VITE_PORT || '3000'),
-		},
+		}
 	};
 });

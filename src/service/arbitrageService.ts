@@ -68,17 +68,29 @@ export const getPairDetails = (symbol: string, days?: number): Promise<PairDetai
 	return fetchWithAuth(`/arbitrage/pair/${symbol}${params}`);
 };
 
-export const getArbitrageOpportunities = (
-	limit?: number,
-	minProfit?: number,
-): Promise<{
+export interface PaginationInfo {
+	offset: number;
+	limit: number;
+	total: number;
+	hasMore: boolean;
+	nextOffset: number | null;
+}
+
+export interface ArbitrageOpportunitiesResponse {
 	opportunities: ArbitrageOpportunity[];
-	count: number;
+	pagination: PaginationInfo;
 	timestamp: string;
-}> => {
+}
+
+export const getArbitrageOpportunities = (
+	offset: number = 0,
+	limit: number = 10,
+	minProfit: number = 0.0001,
+): Promise<ArbitrageOpportunitiesResponse> => {
 	const params = new URLSearchParams();
-	if (limit) params.append('limit', limit.toString());
-	if (minProfit) params.append('min_profit', minProfit.toString());
+	params.append('offset', offset.toString());
+	params.append('limit', limit.toString());
+	params.append('min_profit', minProfit.toString());
 
 	return fetchWithAuth(`/arbitrage/opportunities?${params.toString()}`);
 };

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useBackButton } from '../hooks/useBackButton';
 import { getFundingRatesComparison } from '../service/arbitrageService';
@@ -22,6 +22,17 @@ const AnalyticsPage: React.FC = () => {
 	const [error, setError] = useState<string | null>(null);
 	const [sortBy, setSortBy] = useState<SortOption>('profit_desc');
 	const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
+
+	// Пагинация и бесконечная прокрутка
+	const [displayedPairs, setDisplayedPairs] = useState<
+		Array<{ key: string; pair: any; profit: number; riskLevel: string }>
+	>([]);
+	const [currentPage, setCurrentPage] = useState(0);
+	const [loadingMore, setLoadingMore] = useState(false);
+	const [hasMore, setHasMore] = useState(true);
+	const itemsPerPage = 10;
+	const observerRef = useRef<IntersectionObserver | null>(null);
+	const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
 	useBackButton(() => navigate('/'));
 
@@ -53,7 +64,7 @@ const AnalyticsPage: React.FC = () => {
 		handlePairClickUtil(symbol, navigate, location.pathname);
 	};
 
-	const filteredAndSortedPairs = useMemo(() => {
+	const allFilteredAndSortedPairs = useMemo(() => {
 		if (!data) return [];
 
 		let pairs = Object.entries(data.comparison || {})
@@ -116,6 +127,61 @@ const AnalyticsPage: React.FC = () => {
 		return pairs;
 	}, [data, filters, sortBy]);
 
+	// Функция для загрузки следующей страницы
+	const loadMorePairs = useCallback(() => {
+		if (loadingMore || !hasMore) return;
+
+		setLoadingMore(true);
+
+		const nextPage = currentPage + 1;
+		const startIndex = nextPage * itemsPerPage;
+		const endIndex = startIndex + itemsPerPage;
+		const nextPagePairs = allFilteredAndSortedPairs.slice(startIndex, endIndex);
+
+		if (nextPagePairs.length === 0) {
+			setHasMore(false);
+		} else {
+			setDisplayedPairs((prev) => [...prev, ...nextPagePairs]);
+			setCurrentPage(nextPage);
+		}
+
+		setLoadingMore(false);
+	}, [allFilteredAndSortedPairs, currentPage, itemsPerPage, loadingMore, hasMore]);
+
+	// Сброс пагинации при изменении фильтров или сортировки
+	useEffect(() => {
+		const firstPagePairs = allFilteredAndSortedPairs.slice(0, itemsPerPage);
+		setDisplayedPairs(firstPagePairs);
+		setCurrentPage(0);
+		setHasMore(allFilteredAndSortedPairs.length > itemsPerPage);
+	}, [allFilteredAndSortedPairs, itemsPerPage]);
+
+	// Настройка Intersection Observer для бесконечной прокрутки
+	useEffect(() => {
+		if (observerRef.current) {
+			observerRef.current.disconnect();
+		}
+
+		observerRef.current = new IntersectionObserver(
+			(entries) => {
+				if (entries[0].isIntersecting && hasMore && !loadingMore) {
+					loadMorePairs();
+				}
+			},
+			{ threshold: 0.1 },
+		);
+
+		if (loadMoreRef.current) {
+			observerRef.current.observe(loadMoreRef.current);
+		}
+
+		return () => {
+			if (observerRef.current) {
+				observerRef.current.disconnect();
+			}
+		};
+	}, [loadMorePairs, hasMore, loadingMore]);
+
 	if (loading && !data) {
 		return (
 			<div className="flex flex-col gap-6 pb-6">
@@ -151,8 +217,7 @@ const AnalyticsPage: React.FC = () => {
 		return null;
 	}
 
-	const totalPairs = Object.keys(data.comparison || {}).length;
-	const availablePairs = filteredAndSortedPairs.length;
+	const availablePairs = allFilteredAndSortedPairs.length;
 
 	return (
 		<div className="flex flex-col gap-6 pb-6">
@@ -161,7 +226,7 @@ const AnalyticsPage: React.FC = () => {
 					<h1 className="font-tertiary-bold text-[var(--color-text)] text-xl">Trading Pairs</h1>
 					<div className="flex items-center gap-2 mt-1 flex-wrap">
 						<span className="text-sm text-[var(--color-text-tertiary)]">
-							{availablePairs} of {totalPairs} pairs
+							{displayedPairs.length} of {availablePairs} pairs shown
 						</span>
 						{refreshing && (
 							<div className="flex items-center gap-1">
@@ -184,7 +249,7 @@ const AnalyticsPage: React.FC = () => {
 			/>
 
 			<div className="flex flex-col gap-3">
-				{filteredAndSortedPairs.length === 0 ? (
+				{displayedPairs.length === 0 ? (
 					<ActionCard
 						icon="🔍"
 						title="No pairs found"
@@ -193,14 +258,34 @@ const AnalyticsPage: React.FC = () => {
 						className="bg-[var(--color-bg-secondary)] border-0"
 					/>
 				) : (
-					filteredAndSortedPairs.map(({ key, pair }) => (
-						<PairCard
-							key={key}
-							pair={[key, pair]}
-							opportunities={data.opportunities || []}
-							onClick={handlePairClick}
+					<>
+						{displayedPairs.map(({ key, pair }) => (
+							<PairCard
+								key={key}
+								pair={[key, pair]}
+								opportunities={data.opportunities || []}
+								onClick={handlePairClick}
+							/>
+						))}
+
+						{/* Индикатор загрузки */}
+						{loadingMore && (
+							<div className="flex justify-center py-4">
+								<div className="w-6 h-6 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin"></div>
+							</div>
+						)}
+
+						{/* Скрытый элемент для Intersection Observer */}
+						<div
+							ref={loadMoreRef}
+							className="h-1"
 						/>
-					))
+
+						{/* Сообщение о том, что больше нет данных */}
+						{!hasMore && displayedPairs.length > 0 && (
+							<div className="text-center text-[var(--color-text-tertiary)] text-sm py-4">No more pairs to load</div>
+						)}
+					</>
 				)}
 			</div>
 		</div>
