@@ -7,7 +7,6 @@ import SquircleWrap from '../components/SquircleWrap';
 import Input from '../components/inputs/Input';
 import Select from '../components/inputs/Select';
 import ActionCard from '../components/ActionCard';
-import Skeleton from '../components/Skeleton';
 import { useAuth } from '../providers/AuthProvider';
 import useTelegram from '../hooks/useTelegram';
 import type { TradingPair } from '../types/Shared';
@@ -21,33 +20,34 @@ const CreateNotificationPage: React.FC = () => {
 	const [selectedPair, setSelectedPair] = useState<string>('');
 	const [threshold, setThreshold] = useState<number>(0.01);
 	const [saving, setSaving] = useState(false);
-	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 	const [tradingPairs, setTradingPairs] = useState<TradingPair[]>([]);
+	const [pairsLoading, setPairsLoading] = useState(false);
 
 	useBackButton(() => navigate('/settings/notifications'));
 
-	// Загружаем торговые пары
 	const loadTradingPairs = useCallback(async () => {
 		try {
-			setLoading(true);
+			setPairsLoading(true);
 			setError(null);
 
 			const pairs = await notificationsService.getTradingPairs();
 			setTradingPairs(pairs);
 		} catch (error) {
 			console.error('Failed to load trading pairs:', error);
-			setError('Unable to load trading pairs. Please try again.');
+			if (error instanceof Error) {
+				setError(error.message);
+			} else {
+				setError('Unable to load trading pairs. Please try again.');
+			}
 		} finally {
-			setLoading(false);
+			setPairsLoading(false);
 		}
 	}, []);
 
 	useEffect(() => {
 		if (isAuthenticated) {
 			loadTradingPairs();
-		} else {
-			setLoading(false);
 		}
 	}, [isAuthenticated, loadTradingPairs]);
 
@@ -73,7 +73,11 @@ const CreateNotificationPage: React.FC = () => {
 			navigate('/settings/notifications');
 		} catch (error) {
 			console.error('Failed to save notification:', error);
-			setError('Failed to create notification. Please try again.');
+			if (error instanceof Error) {
+				setError(error.message);
+			} else {
+				setError('Failed to create notification. Please try again.');
+			}
 		} finally {
 			setSaving(false);
 		}
@@ -89,54 +93,7 @@ const CreateNotificationPage: React.FC = () => {
 
 	const canSave = type === 'global' || (type === 'pair' && selectedPair);
 
-	if (loading) {
-		return (
-			<div className="flex flex-col gap-6 pb-6">
-				{/* Header */}
-				<div className={`flex items-start justify-between gap-4 ${fullScreenPaddingTop}`}>
-					<div className="flex-1 min-w-0">
-						<Skeleton className="h-8 w-48 mb-2" />
-						<Skeleton className="h-4 w-32" />
-					</div>
-				</div>
-
-				{/* Alert Type */}
-				<SquircleWrap className="bg-[var(--color-bg-secondary)] p-4">
-					<Skeleton className="h-6 w-24 mb-4" />
-					<Skeleton className="h-12 w-full rounded-lg" />
-				</SquircleWrap>
-
-				{/* Pair Selection */}
-				<SquircleWrap className="bg-[var(--color-bg-secondary)] p-4">
-					<Skeleton className="h-6 w-32 mb-4" />
-					<Skeleton className="h-12 w-full rounded-lg" />
-				</SquircleWrap>
-
-				{/* Threshold Setting */}
-				<SquircleWrap className="bg-[var(--color-bg-secondary)] p-4">
-					<Skeleton className="h-6 w-28 mb-4" />
-					<Skeleton className="h-12 w-full rounded-lg" />
-				</SquircleWrap>
-
-				{/* Preview */}
-				<SquircleWrap className="bg-[var(--color-bg-secondary)] p-4">
-					<Skeleton className="h-6 w-16 mb-3" />
-					<div className="bg-[var(--color-border)] bg-opacity-30 p-4 rounded-lg">
-						<Skeleton className="h-4 w-24 mb-1" />
-						<Skeleton className="h-3 w-32 mb-2" />
-						<Skeleton className="h-8 w-full rounded" />
-					</div>
-				</SquircleWrap>
-
-				{/* Save Button */}
-				<SquircleWrap className="bg-[var(--color-bg-secondary)] p-4">
-					<Skeleton className="h-8 w-full rounded-lg" />
-				</SquircleWrap>
-			</div>
-		);
-	}
-
-	if (error) {
+	if (error && tradingPairs.length === 0) {
 		return (
 			<div className="flex flex-col gap-6 pb-6">
 				<div className={`flex items-start justify-between gap-4 ${fullScreenPaddingTop}`}>
@@ -202,7 +159,8 @@ const CreateNotificationPage: React.FC = () => {
 							setSelectedPair(e.target.value);
 							hapticTrigger('soft');
 						}}
-						placeholder="Choose a trading pair"
+						placeholder={pairsLoading ? 'Loading trading pairs...' : 'Choose a trading pair'}
+						disabled={pairsLoading}
 						options={tradingPairs.map((pair) => ({
 							value: pair.symbol,
 							label: `${pair.label} (${notificationsService.getCurrentRate(pair)})`,

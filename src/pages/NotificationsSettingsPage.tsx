@@ -35,7 +35,11 @@ const NotificationsSettingsPage: React.FC = () => {
 			setNotifications(data);
 		} catch (error) {
 			console.error('Failed to load notifications:', error);
-			setError('Unable to load notifications. Please try again.');
+			if (error instanceof Error) {
+				setError(error.message);
+			} else {
+				setError('Unable to load notifications. Please try again.');
+			}
 		} finally {
 			setLoading(false);
 		}
@@ -61,7 +65,11 @@ const NotificationsSettingsPage: React.FC = () => {
 			setNotifications((prev) => prev.map((n) => (n.id === id ? updatedNotification : n)));
 		} catch (error) {
 			console.error('Failed to toggle notification:', error);
-			setError('Failed to update notification. Please try again.');
+			if (error instanceof Error) {
+				setError(error.message);
+			} else {
+				setError('Failed to update notification. Please try again.');
+			}
 		}
 	};
 
@@ -75,7 +83,11 @@ const NotificationsSettingsPage: React.FC = () => {
 			setNotifications((prev) => prev.filter((n) => n.id !== id));
 		} catch (error) {
 			console.error('Failed to delete notification:', error);
-			setError('Failed to delete notification. Please try again.');
+			if (error instanceof Error) {
+				setError(error.message);
+			} else {
+				setError('Failed to delete notification. Please try again.');
+			}
 		}
 	};
 
@@ -91,14 +103,17 @@ const NotificationsSettingsPage: React.FC = () => {
 			setTimeout(() => setTestNotificationSent(false), 3000);
 		} catch (error) {
 			console.error('Failed to send test notification:', error);
-			setError('Failed to send test notification. Please try again.');
+			if (error instanceof Error) {
+				setError(error.message);
+			} else {
+				setError('Failed to send test notification. Please try again.');
+			}
 		}
 	};
 
 	const activeCount = notifications.filter((n) => n.enabled).length;
 
-
-	if (error) {
+	if (error && notifications.length === 0) {
 		return (
 			<div className="flex flex-col gap-6 pb-6">
 				<div className={`flex items-start justify-between gap-4 ${fullScreenPaddingTop}`}>
@@ -138,6 +153,25 @@ const NotificationsSettingsPage: React.FC = () => {
 					<span className="text-xs text-[var(--color-text-tertiary)]">{activeCount} active</span>
 				</div>
 			</div>
+
+			{/* Error Message */}
+			{error && (
+				<div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 p-4 rounded-2xl">
+					<div className="flex items-center gap-3">
+						<div className="text-orange-600 dark:text-orange-400 text-lg">⚠️</div>
+						<div className="flex-1">
+							<div className="text-orange-800 dark:text-orange-200 font-medium">Warning</div>
+							<div className="text-orange-600 dark:text-orange-400 text-sm">{error}</div>
+						</div>
+						<button
+							onClick={() => setError(null)}
+							className="text-orange-600 dark:text-orange-400 hover:text-orange-800 dark:hover:text-orange-200"
+						>
+							✕
+						</button>
+					</div>
+				</div>
+			)}
 
 			{/* Create New Notification */}
 			<ActionCard
