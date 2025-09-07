@@ -2,6 +2,7 @@ import { Route, Routes } from 'react-router-dom';
 import './index.css';
 
 import useTelegram from './hooks/useTelegram';
+import { useAuth } from './providers/AuthProvider';
 import HomePage from './pages/HomePage';
 import AuthPage from './pages/AuthPage';
 import PairDetailsPage from './pages/PairDetailsPage';
@@ -9,9 +10,15 @@ import AnalyticsPage from './pages/AnalyticsPage';
 import DashboardsPage from './pages/DashboardsPage';
 import NotificationsSettingsPage from './pages/NotificationsSettingsPage';
 import CreateNotificationPage from './pages/CreateNotificationPage';
+import TelegramOnlyPage from './pages/TelegramOnlyPage';
 
 function App() {
 	const { theme } = useTelegram();
+	const { isNotInTelegram } = useAuth();
+
+	if (isNotInTelegram) {
+		return <TelegramOnlyPage />;
+	}
 
 	return (
 		<main className={theme}>

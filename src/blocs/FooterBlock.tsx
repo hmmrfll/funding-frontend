@@ -15,7 +15,7 @@ const FooterBlock = () => {
 			<div className="grid grid-cols-2 gap-4">
 				<SquircleWrap
 					className="bg-[var(--color-bg-secondary)] p-4 flex items-center gap-3 cursor-pointer hover:bg-[var(--color-border)] transition-colors"
-					onClick={() => handleLinkClick('https://github.com/your-repo')}
+					onClick={() => handleLinkClick('https://github.com/hmmrfll/funding-backend')}
 				>
 					<div className="text-2xl">⚡</div>
 					<div className="flex-1 min-w-0">
@@ -29,7 +29,7 @@ const FooterBlock = () => {
 
 				<SquircleWrap
 					className="bg-[var(--color-bg-secondary)] p-4 flex items-center gap-3 cursor-pointer hover:bg-[var(--color-border)] transition-colors"
-					onClick={() => handleLinkClick('https://t.me/your-channel')}
+					onClick={() => handleLinkClick('https://t.me/vm4sto')}
 				>
 					<div className="text-2xl">📢</div>
 					<div className="flex-1 min-w-0">

@@ -7,11 +7,11 @@ import ChevronRight from '../assets/ChevronRight.tsx';
 import Skeleton from '../components/Skeleton';
 
 const UserProfileBlock = () => {
-	const { user, isLoading, error, isAuthenticated, authToken } = useAuth();
+	const { user, isLoading, error } = useAuth();
 	const navigate = useNavigate();
 
 	const handleClick = () => {
-		navigate('/settings/notifications');
+		navigate('/settings');
 	};
 
 	const getApiKeysStatus = () => {
@@ -34,25 +34,6 @@ const UserProfileBlock = () => {
 				subtitle: '',
 				isLoading: true,
 				onClick: undefined,
-				className: '',
-				iconClassName: '',
-			};
-		}
-
-		if (!isAuthenticated) {
-			return {
-				icon: (
-					<div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
-						<span className="text-white text-xl">🔐</span>
-					</div>
-				),
-				title: 'Connect Telegram',
-				subtitle: 'Login to access your account',
-				isLoading: false,
-				onClick: () => {
-					const uuid = crypto.randomUUID();
-					window.open(`https://t.me/funarbitragebot?start=web_auth_${uuid}`, '_blank');
-				},
 				className: '',
 				iconClassName: '',
 			};
@@ -100,10 +81,10 @@ const UserProfileBlock = () => {
 			title: user?.name || 'Unknown User',
 			subtitle: `Chat ID: ${user?.telegramId}`,
 			isLoading: false,
-			onClick: handleClick,
+			onClick: undefined,
 			className: '',
 			iconClassName: 'relative',
-			showChevron: true,
+			showChevron: false,
 		};
 	};
 
@@ -111,25 +92,19 @@ const UserProfileBlock = () => {
 
 	return (
 		<>
-			<div className={`flex items-center space-x-3 ${fullScreenPaddingTop}`}>
+			<div
+				className={`flex items-center space-x-3 ${fullScreenPaddingTop} ${content.className} ${
+					content.onClick ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''
+				}`}
+				onClick={content.onClick}
+			>
 				<div className={content.iconClassName}>{content.icon}</div>
 
 				<div className="flex-1 min-w-0 flex flex-col h-full justify-center gap-[2px]">
 					{content.isLoading ? (
 						<>
-							<Skeleton
-								width={160}
-								height={16}
-								cornerRadius={4}
-								colorMode="gray"
-								className="mb-2"
-							/>
-							<Skeleton
-								width={80}
-								height={12}
-								cornerRadius={4}
-								colorMode="gray"
-							/>
+							<Skeleton className="w-40 h-4 rounded mb-2" />
+							<Skeleton className="w-20 h-3 rounded" />
 						</>
 					) : (
 						<>

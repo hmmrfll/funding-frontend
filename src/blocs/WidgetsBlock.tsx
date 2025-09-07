@@ -1,20 +1,39 @@
 import SquircleWrap from '../components/SquircleWrap';
 import { useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useAuth } from '../providers/AuthProvider';
 import ArbitrageBackground from '../assets/ArbitrageBackground';
 import NotificationsBackground from '../assets/NotificationsBackground';
+import notificationsService from '../service/notificationsService';
+import { useState, useEffect } from 'react';
+import type { NotificationRule } from '../types/Shared';
 
 const DashboardBlock = () => {
 	const navigate = useNavigate();
-	const [notificationsActive, setNotificationsActive] = useState(true);
+	const { user, isAuthenticated } = useAuth();
+	const [notifications, setNotifications] = useState<NotificationRule[]>([]);
+	const [notificationsLoading, setNotificationsLoading] = useState(true);
 
 	useEffect(() => {
-		const interval = setInterval(() => {
-			setNotificationsActive((prev) => !prev);
-		}, 5000);
+		const loadNotifications = async () => {
+			if (!user?.id || !isAuthenticated) {
+				setNotificationsLoading(false);
+				return;
+			}
 
-		return () => clearInterval(interval);
-	}, []);
+			try {
+				const data = await notificationsService.getNotifications(user.id);
+				setNotifications(data);
+			} catch (error) {
+				console.error('Failed to load notifications:', error);
+			} finally {
+				setNotificationsLoading(false);
+			}
+		};
+
+		loadNotifications();
+	}, [user?.id, isAuthenticated]);
+
+	const notificationsActive = notifications.some((n) => n.enabled);
 
 	const handleArbitrageClick = () => {
 		navigate('/dashboards');
@@ -57,18 +76,27 @@ const DashboardBlock = () => {
 				</div>
 
 				<div className="flex items-center gap-2 z-10">
-					<div
-						className={`w-2 h-2 rounded-full ${
-							notificationsActive ? 'bg-orange-500' : 'bg-gray-400'
-						} transition-colors duration-300`}
-					></div>
-					<span
-						className={`text-xs font-medium ${
-							notificationsActive ? 'text-orange-500' : 'text-gray-500'
-						} transition-colors duration-300`}
-					>
-						{notificationsActive ? 'Active' : 'Silent'}
-					</span>
+					{notificationsLoading ? (
+						<>
+							<div className="w-2 h-2 bg-gray-300 rounded-full animate-pulse"></div>
+							<span className="text-xs text-gray-400">Loading...</span>
+						</>
+					) : (
+						<>
+							<div
+								className={`w-2 h-2 rounded-full ${
+									notificationsActive ? 'bg-orange-500' : 'bg-gray-400'
+								} transition-colors duration-300`}
+							></div>
+							<span
+								className={`text-xs font-medium ${
+									notificationsActive ? 'text-orange-500' : 'text-gray-500'
+								} transition-colors duration-300`}
+							>
+								{notificationsActive ? `${notifications.filter((n) => n.enabled).length} active` : 'No alerts'}
+							</span>
+						</>
+					)}
 				</div>
 			</SquircleWrap>
 		</div>

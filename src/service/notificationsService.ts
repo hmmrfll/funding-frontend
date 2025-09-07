@@ -1,9 +1,7 @@
-// src/service/notificationsService.ts
 import type { NotificationRule, TradingPair } from '../types/Shared';
 import fetchWithAuth from './fetchWithAuth';
 
 class NotificationsService {
-	// API методы для уведомлений
 	async getNotifications(userId: string): Promise<NotificationRule[]> {
 		try {
 			const response = await fetchWithAuth('/notifications/rules');
@@ -74,7 +72,6 @@ class NotificationsService {
 
 	async getTradingPairs(): Promise<TradingPair[]> {
 		try {
-			// Получаем данные из funding rates comparison
 			const response = await fetchWithAuth('/arbitrage/funding-rates');
 
 			const pairs: TradingPair[] = Object.entries(response.comparison || {})
@@ -94,17 +91,15 @@ class NotificationsService {
 
 	async sendTestNotification(userId: string): Promise<void> {
 		try {
-			// Пока тестовое уведомление можно отправить через создание временного правила
-			// В будущем можно добавить отдельный endpoint
-			await new Promise(resolve => setTimeout(resolve, 1000));
-			console.log('Test notification sent (simulated)');
+			await fetchWithAuth('/notifications/test', {
+				method: 'POST',
+			});
 		} catch (error) {
 			console.error('Failed to send test notification:', error);
 			throw new Error('Failed to send test notification. Please try again.');
 		}
 	}
 
-	// Трансформация данных с API в формат фронтенда
 	private transformNotificationFromAPI(apiData: any): NotificationRule {
 		return {
 			id: apiData.id,
@@ -118,7 +113,6 @@ class NotificationsService {
 		};
 	}
 
-	// Генерация читаемого названия пары
 	private generatePairLabel(symbol: string): string {
 		const symbolMap: Record<string, string> = {
 			'BTC/USD': 'Bitcoin/USD',
@@ -136,7 +130,6 @@ class NotificationsService {
 		return symbolMap[symbol] || symbol;
 	}
 
-	// Утилиты
 	formatPercentage(value: number): string {
 		return `${(value * 100).toFixed(2)}%`;
 	}

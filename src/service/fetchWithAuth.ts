@@ -3,25 +3,18 @@ const serverUrl = import.meta.env.VITE_BACKEND_URL;
 const fetchWithAuth = async (url: string, options: RequestInit = {}) => {
 	const hasBody = !!options.body && !(options.body instanceof FormData);
 
-	let initDataRaw = import.meta.env.VITE_DEV_INIT_DATA;
+	let initDataRaw: string | null = null;
 
-	// Проверяем localStorage для web токенов
-	if (typeof window !== 'undefined') {
-		const webToken = localStorage.getItem('auth_token');
-		if (webToken) {
-			initDataRaw = webToken;
-		} else if (window.Telegram?.WebApp?.initData) {
-			initDataRaw = window.Telegram.WebApp.initData;
-		}
+	if (typeof window !== 'undefined' && window.Telegram?.WebApp?.initData) {
+		initDataRaw = window.Telegram.WebApp.initData;
+	}
+
+	if (!initDataRaw && import.meta.env.DEV) {
+		initDataRaw = import.meta.env.VITE_DEV_INIT_DATA || null;
 	}
 
 	if (!initDataRaw) {
-		// Проверяем, находимся ли мы в Telegram окружении
-		if (typeof window !== 'undefined' && window.Telegram?.WebApp) {
-			throw new Error('Telegram WebApp initialized but no initData available');
-		} else {
-			throw new Error('No authentication data available. Please connect via Telegram.');
-		}
+		throw new Error('No Telegram authentication data available. Please open this app in Telegram.');
 	}
 
 	const headers = {

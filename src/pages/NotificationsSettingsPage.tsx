@@ -142,7 +142,6 @@ const NotificationsSettingsPage: React.FC = () => {
 
 	return (
 		<div className="flex flex-col gap-6 pb-6">
-			{/* Header */}
 			<div className={`flex items-start justify-between gap-4 ${fullScreenPaddingTop}`}>
 				<div className="flex-1 min-w-0">
 					<h1 className="font-tertiary-bold text-[var(--color-text)] text-xl">Notifications</h1>
@@ -154,7 +153,6 @@ const NotificationsSettingsPage: React.FC = () => {
 				</div>
 			</div>
 
-			{/* Error Message */}
 			{error && (
 				<div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 p-4 rounded-2xl">
 					<div className="flex items-center gap-3">
@@ -173,7 +171,6 @@ const NotificationsSettingsPage: React.FC = () => {
 				</div>
 			)}
 
-			{/* Create New Notification */}
 			<ActionCard
 				icon="➕"
 				title="Create New Notification"
@@ -182,7 +179,6 @@ const NotificationsSettingsPage: React.FC = () => {
 				className="bg-[var(--color-primary)] bg-opacity-10 border border-[var(--color-primary)] border-opacity-30"
 			/>
 
-			{/* Notifications List */}
 			<NotificationsListBlock
 				notifications={notifications}
 				onToggleNotification={handleToggleNotification}
@@ -190,7 +186,6 @@ const NotificationsSettingsPage: React.FC = () => {
 				loading={loading}
 			/>
 
-			{/* Test Notification */}
 			<ActionCard
 				icon="🧪"
 				title="Send Test Notification"
