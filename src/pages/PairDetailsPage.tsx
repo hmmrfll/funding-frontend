@@ -8,6 +8,7 @@ import StatisticsCard from '../components/StatisticsCard';
 import ActionCard from '../components/ActionCard';
 import ErrorBlock from '../blocs/ErrorBlock';
 import ArbitrageOpportunitiesList from '../components/ArbitrageOpportunitiesList';
+import Skeleton from '../components/Skeleton';
 import { getPairDetails } from '../service/arbitrageService';
 import type { PairDetails } from '../service/arbitrageService';
 
@@ -67,16 +68,16 @@ const PairDetailsPage: React.FC = () => {
 		return (
 			<div className="flex flex-col gap-6">
 				<div className="flex items-center justify-between pt-[75px]">
-					<div className="animate-pulse">
-						<div className="h-8 bg-[var(--color-bg-tertiary)] rounded w-24 mb-2"></div>
+					<div>
+						<Skeleton className="h-8 w-24 mb-2" />
 						<div className="flex items-center gap-2">
-							<div className="h-4 bg-[var(--color-bg-tertiary)] rounded w-32"></div>
-							<div className="h-4 bg-[var(--color-bg-tertiary)] rounded w-16"></div>
+							<Skeleton className="h-4 w-32" />
+							<Skeleton className="h-4 w-16" />
 						</div>
 					</div>
-					<div className="animate-pulse">
-						<div className="h-4 bg-[var(--color-bg-tertiary)] rounded w-20 mb-1"></div>
-						<div className="h-6 bg-[var(--color-bg-tertiary)] rounded w-16"></div>
+					<div>
+						<Skeleton className="h-4 w-20 mb-1" />
+						<Skeleton className="h-6 w-16" />
 					</div>
 				</div>
 
@@ -101,6 +102,24 @@ const PairDetailsPage: React.FC = () => {
 						minSpread: null,
 					}}
 					loading={true}
+				/>
+
+				<ActionCard
+					icon="🔔"
+					title="Set Price Alert"
+					description="Get notified when profit exceeds threshold"
+					buttonText="Setup"
+					showChevron={false}
+					onClick={handleSetPriceAlert}
+				/>
+
+				<ActionCard
+					icon="📊"
+					title="View All Opportunities"
+					description="Browse all available arbitrage opportunities"
+					buttonText={showOpportunities ? 'Hide' : 'Show'}
+					showChevron={false}
+					onClick={() => setShowOpportunities(!showOpportunities)}
 				/>
 			</div>
 		);

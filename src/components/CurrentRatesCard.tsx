@@ -1,5 +1,6 @@
 import React from 'react';
 import SquircleWrap from './SquircleWrap';
+import Skeleton from './Skeleton';
 
 type ExchangeData = {
 	fundingRate: number | null;
@@ -39,24 +40,24 @@ const CurrentRatesCard: React.FC<Props> = ({ extended, hyperliquid, loading = fa
 		return (
 			<div className="grid grid-cols-2 gap-4">
 				<SquircleWrap className="bg-[var(--color-bg-secondary)] p-4">
-					<div className="animate-pulse">
+					<div className="flex flex-col">
 						<div className="flex items-center justify-between mb-2">
-							<div className="h-4 bg-gray-300 rounded w-16"></div>
+							<Skeleton className="h-4 w-16" />
 						</div>
-						<div className="h-8 bg-gray-300 rounded w-24 mb-1"></div>
-						<div className="h-3 bg-gray-300 rounded w-20"></div>
-						<div className="h-3 bg-gray-300 rounded w-16 mt-1"></div>
+						<Skeleton className="h-8 w-24 mb-1" />
+						<Skeleton className="h-3 w-20" />
+						<Skeleton className="h-3 w-16 mt-1" />
 					</div>
 				</SquircleWrap>
 
 				<SquircleWrap className="bg-[var(--color-bg-secondary)] p-4">
-					<div className="animate-pulse">
+					<div className="flex flex-col">
 						<div className="flex items-center justify-between mb-2">
-							<div className="h-4 bg-gray-300 rounded w-20"></div>
+							<Skeleton className="h-4 w-20" />
 						</div>
-						<div className="h-8 bg-gray-300 rounded w-24 mb-1"></div>
-						<div className="h-3 bg-gray-300 rounded w-20"></div>
-						<div className="h-3 bg-gray-300 rounded w-12 mt-1"></div>
+						<Skeleton className="h-8 w-24 mb-1" />
+						<Skeleton className="h-3 w-20" />
+						<Skeleton className="h-3 w-12 mt-1" />
 					</div>
 				</SquircleWrap>
 			</div>

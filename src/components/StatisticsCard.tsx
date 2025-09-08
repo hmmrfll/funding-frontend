@@ -1,5 +1,6 @@
 import React from 'react';
 import SquircleWrap from './SquircleWrap';
+import Skeleton from './Skeleton';
 
 type Statistics = {
 	avgExtended: number | null;
@@ -24,26 +25,24 @@ const StatisticsCard: React.FC<Props> = ({ statistics, title = '📊 Statistics'
 	if (loading) {
 		return (
 			<SquircleWrap className="bg-[var(--color-bg-secondary)] p-4">
-				<div className="animate-pulse">
-					<div className="flex flex-col gap-3">
-						<div className="h-5 bg-gray-300 rounded w-20"></div>
-						<div className="grid grid-cols-2 gap-4 text-sm">
-							<div>
-								<div className="h-3 bg-gray-300 rounded w-20 mb-1"></div>
-								<div className="h-4 bg-gray-300 rounded w-16"></div>
-							</div>
-							<div>
-								<div className="h-3 bg-gray-300 rounded w-20 mb-1"></div>
-								<div className="h-4 bg-gray-300 rounded w-16"></div>
-							</div>
-							<div>
-								<div className="h-3 bg-gray-300 rounded w-16 mb-1"></div>
-								<div className="h-4 bg-gray-300 rounded w-16"></div>
-							</div>
-							<div>
-								<div className="h-3 bg-gray-300 rounded w-16 mb-1"></div>
-								<div className="h-4 bg-gray-300 rounded w-16"></div>
-							</div>
+				<div className="flex flex-col gap-3">
+					<Skeleton className="h-5 w-20" />
+					<div className="grid grid-cols-2 gap-4 text-sm">
+						<div>
+							<Skeleton className="h-3 w-20 mb-1" />
+							<Skeleton className="h-4 w-16" />
+						</div>
+						<div>
+							<Skeleton className="h-3 w-20 mb-1" />
+							<Skeleton className="h-4 w-16" />
+						</div>
+						<div>
+							<Skeleton className="h-3 w-16 mb-1" />
+							<Skeleton className="h-4 w-16" />
+						</div>
+						<div>
+							<Skeleton className="h-3 w-16 mb-1" />
+							<Skeleton className="h-4 w-16" />
 						</div>
 					</div>
 				</div>
