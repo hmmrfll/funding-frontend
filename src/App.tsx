@@ -1,8 +1,10 @@
-import { Route, Routes } from 'react-router-dom';
+import React from 'react';
+import { Route, Routes, useLocation } from 'react-router-dom';
 import './index.css';
 
 import useTelegram from './hooks/useTelegram';
 import { useAuth } from './providers/AuthProvider';
+import { initializeNavigationStack } from './utils/navigationUtils';
 import HomePage from './pages/HomePage';
 import AuthPage from './pages/AuthPage';
 import PairDetailsPage from './pages/PairDetailsPage';
@@ -32,6 +34,12 @@ function App() {
 export default App;
 
 const AppRoutes = () => {
+	const location = useLocation();
+
+	React.useEffect(() => {
+		initializeNavigationStack(location.pathname);
+	}, [location.pathname]);
+
 	return (
 		<Routes>
 			<Route

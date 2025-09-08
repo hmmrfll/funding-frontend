@@ -5,7 +5,14 @@ class NotificationsService {
 	async getNotifications(userId: string): Promise<NotificationRule[]> {
 		try {
 			const response = await fetchWithAuth('/notifications/rules');
-			return response.map(this.transformNotificationFromAPI);
+			console.log('Raw notifications response:', response);
+
+			if (!Array.isArray(response)) {
+				console.error('Expected array but got:', typeof response, response);
+				return [];
+			}
+
+			return response.map((item: any) => this.transformNotificationFromAPI(item));
 		} catch (error) {
 			console.error('Failed to load notifications:', error);
 			throw new Error('Unable to load notifications. Please try again.');
@@ -101,15 +108,22 @@ class NotificationsService {
 	}
 
 	private transformNotificationFromAPI(apiData: any): NotificationRule {
+		console.log('Transforming notification:', apiData);
+
+		if (!apiData || typeof apiData !== 'object') {
+			console.error('Invalid notification data:', apiData);
+			throw new Error('Invalid notification data received from server');
+		}
+
 		return {
-			id: apiData.id,
-			type: apiData.type,
-			symbol: apiData.symbol,
+			id: apiData.id || '',
+			type: apiData.type || 'global',
+			symbol: apiData.symbol || null,
 			symbolLabel: apiData.symbol ? this.generatePairLabel(apiData.symbol) : undefined,
-			threshold: apiData.threshold,
-			enabled: apiData.enabled,
-			createdAt: apiData.createdAt,
-			updatedAt: apiData.updatedAt,
+			threshold: apiData.threshold || 0,
+			enabled: Boolean(apiData.enabled),
+			createdAt: apiData.createdAt || new Date().toISOString(),
+			updatedAt: apiData.updatedAt || new Date().toISOString(),
 		};
 	}
 

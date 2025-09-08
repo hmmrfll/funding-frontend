@@ -1,7 +1,7 @@
-// src/pages/NotificationsSettingsPage.tsx
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useBackButton } from '../hooks/useBackButton';
+import { navigateToCreateNotification, navigateBack } from '../utils/navigationUtils';
 import { fullScreenPaddingTop } from '../utils/isMobile';
 import ActionCard from '../components/ActionCard';
 import NotificationsListBlock from '../blocs/NotificationsListBlock';
@@ -12,6 +12,7 @@ import notificationsService from '../service/notificationsService';
 
 const NotificationsSettingsPage: React.FC = () => {
 	const navigate = useNavigate();
+	const location = useLocation();
 	const { user, isAuthenticated } = useAuth();
 	const { hapticTrigger } = useTelegram();
 	const [notifications, setNotifications] = useState<NotificationRule[]>([]);
@@ -19,7 +20,7 @@ const NotificationsSettingsPage: React.FC = () => {
 	const [error, setError] = useState<string | null>(null);
 	const [testNotificationSent, setTestNotificationSent] = useState(false);
 
-	useBackButton(() => navigate('/'));
+	useBackButton(() => navigateBack(navigate));
 
 	const loadNotifications = useCallback(async () => {
 		if (!user?.id || !isAuthenticated) {
@@ -175,7 +176,7 @@ const NotificationsSettingsPage: React.FC = () => {
 				icon="➕"
 				title="Create New Notification"
 				description="Set up a new arbitrage alert"
-				onClick={() => navigate('/settings/notifications/create')}
+				onClick={() => navigateToCreateNotification(navigate, location.pathname)}
 				className="bg-[var(--color-primary)] bg-opacity-10 border border-[var(--color-primary)] border-opacity-30"
 			/>
 

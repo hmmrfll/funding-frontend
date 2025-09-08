@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useBackButton } from '../hooks/useBackButton';
+import { navigateBack } from '../utils/navigationUtils';
 import { getFundingRatesComparison } from '../service/arbitrageService';
 import type { FundingRatesComparison } from '../service/arbitrageService';
 import type { SortOption, FilterState } from '../types/SearchPanel';
@@ -23,7 +24,6 @@ const AnalyticsPage: React.FC = () => {
 	const [sortBy, setSortBy] = useState<SortOption>('profit_desc');
 	const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
 
-	// Пагинация и бесконечная прокрутка
 	const [displayedPairs, setDisplayedPairs] = useState<
 		Array<{ key: string; pair: any; profit: number; riskLevel: string }>
 	>([]);
@@ -34,7 +34,7 @@ const AnalyticsPage: React.FC = () => {
 	const observerRef = useRef<IntersectionObserver | null>(null);
 	const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
-	useBackButton(() => navigate('/'));
+	useBackButton(() => navigateBack(navigate));
 
 	useEffect(() => {
 		const fetchData = async (isInitialLoad = true) => {
@@ -127,7 +127,6 @@ const AnalyticsPage: React.FC = () => {
 		return pairs;
 	}, [data, filters, sortBy]);
 
-	// Функция для загрузки следующей страницы
 	const loadMorePairs = useCallback(() => {
 		if (loadingMore || !hasMore) return;
 
@@ -148,7 +147,6 @@ const AnalyticsPage: React.FC = () => {
 		setLoadingMore(false);
 	}, [allFilteredAndSortedPairs, currentPage, itemsPerPage, loadingMore, hasMore]);
 
-	// Сброс пагинации при изменении фильтров или сортировки
 	useEffect(() => {
 		const firstPagePairs = allFilteredAndSortedPairs.slice(0, itemsPerPage);
 		setDisplayedPairs(firstPagePairs);
@@ -156,7 +154,6 @@ const AnalyticsPage: React.FC = () => {
 		setHasMore(allFilteredAndSortedPairs.length > itemsPerPage);
 	}, [allFilteredAndSortedPairs, itemsPerPage]);
 
-	// Настройка Intersection Observer для бесконечной прокрутки
 	useEffect(() => {
 		if (observerRef.current) {
 			observerRef.current.disconnect();

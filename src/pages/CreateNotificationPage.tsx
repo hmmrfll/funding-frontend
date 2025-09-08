@@ -1,7 +1,7 @@
-// src/pages/CreateNotificationPage.tsx
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useBackButton } from '../hooks/useBackButton';
+import { navigateBack } from '../utils/navigationUtils';
 import { fullScreenPaddingTop } from '../utils/isMobile';
 import SquircleWrap from '../components/SquircleWrap';
 import Input from '../components/inputs/Input';
@@ -14,6 +14,7 @@ import notificationsService from '../service/notificationsService';
 
 const CreateNotificationPage: React.FC = () => {
 	const navigate = useNavigate();
+	const [searchParams] = useSearchParams();
 	const { user, isAuthenticated } = useAuth();
 	const { hapticTrigger } = useTelegram();
 	const [type, setType] = useState<'global' | 'pair'>('global');
@@ -24,7 +25,24 @@ const CreateNotificationPage: React.FC = () => {
 	const [tradingPairs, setTradingPairs] = useState<TradingPair[]>([]);
 	const [pairsLoading, setPairsLoading] = useState(false);
 
-	useBackButton(() => navigate('/settings/notifications'));
+	useBackButton(() => navigateBack(navigate));
+
+	useEffect(() => {
+		const symbolParam = searchParams.get('symbol');
+		const thresholdParam = searchParams.get('threshold');
+
+		if (symbolParam) {
+			setType('pair');
+			setSelectedPair(symbolParam);
+		}
+
+		if (thresholdParam) {
+			const parsedThreshold = parseFloat(thresholdParam);
+			if (!isNaN(parsedThreshold)) {
+				setThreshold(parsedThreshold);
+			}
+		}
+	}, [searchParams]);
 
 	const loadTradingPairs = useCallback(async () => {
 		try {
@@ -70,7 +88,7 @@ const CreateNotificationPage: React.FC = () => {
 			});
 
 			hapticTrigger('heavy');
-			navigate('/settings/notifications');
+			navigateBack(navigate);
 		} catch (error) {
 			console.error('Failed to save notification:', error);
 			if (error instanceof Error) {
@@ -122,7 +140,6 @@ const CreateNotificationPage: React.FC = () => {
 
 	return (
 		<div className="flex flex-col gap-6 pb-6">
-			{/* Header */}
 			<div className={`flex items-start justify-between gap-4 ${fullScreenPaddingTop}`}>
 				<div className="flex-1 min-w-0">
 					<h1 className="font-tertiary-bold text-[var(--color-text)] text-xl">Create Notification</h1>
@@ -130,7 +147,6 @@ const CreateNotificationPage: React.FC = () => {
 				</div>
 			</div>
 
-			{/* Alert Type */}
 			<SquircleWrap className="bg-[var(--color-bg-secondary)] p-4">
 				<h3 className="font-tertiary-bold text-[var(--color-text)] mb-4">📱 Alert Type</h3>
 
@@ -148,7 +164,6 @@ const CreateNotificationPage: React.FC = () => {
 				/>
 			</SquircleWrap>
 
-			{/* Pair Selection (только для pair type) */}
 			{type === 'pair' && (
 				<SquircleWrap className="bg-[var(--color-bg-secondary)] p-4">
 					<h3 className="font-tertiary-bold text-[var(--color-text)] mb-4">💱 Select Trading Pair</h3>
@@ -169,7 +184,6 @@ const CreateNotificationPage: React.FC = () => {
 				</SquircleWrap>
 			)}
 
-			{/* Threshold Setting */}
 			<SquircleWrap className="bg-[var(--color-bg-secondary)] p-4">
 				<h3 className="font-tertiary-bold text-[var(--color-text)] mb-4">🎯 Profit Threshold</h3>
 
@@ -187,7 +201,6 @@ const CreateNotificationPage: React.FC = () => {
 				/>
 			</SquircleWrap>
 
-			{/* Preview */}
 			<SquircleWrap className="bg-[var(--color-bg-secondary)] p-4">
 				<h3 className="font-tertiary-bold text-[var(--color-text)] mb-3">👀 Preview</h3>
 
@@ -216,7 +229,6 @@ const CreateNotificationPage: React.FC = () => {
 				</div>
 			</SquircleWrap>
 
-			{/* Error Message */}
 			{error && (
 				<SquircleWrap className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-4">
 					<div className="text-center">
@@ -227,7 +239,6 @@ const CreateNotificationPage: React.FC = () => {
 				</SquircleWrap>
 			)}
 
-			{/* Save Button */}
 			<ActionCard
 				icon="💾"
 				title="Save Notification"

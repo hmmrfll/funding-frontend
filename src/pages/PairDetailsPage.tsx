@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useBackButton } from '../hooks/useBackButton';
-import { navigateBack } from '../utils/navigationUtils';
+import { navigateBack, navigateToCreateNotification } from '../utils/navigationUtils';
 import CurrentRatesCard from '../components/CurrentRatesCard';
 import ProfitCalculator from '../components/ProfitCalculator';
 import StatisticsCard from '../components/StatisticsCard';
@@ -14,6 +14,7 @@ import type { PairDetails } from '../service/arbitrageService';
 const PairDetailsPage: React.FC = () => {
 	const { symbol } = useParams<{ symbol: string }>();
 	const navigate = useNavigate();
+	const location = useLocation();
 	const [pairData, setPairData] = useState<PairDetails | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [refreshing, setRefreshing] = useState(false);
@@ -23,6 +24,16 @@ const PairDetailsPage: React.FC = () => {
 	useBackButton(() => navigateBack(navigate));
 
 	const pairSymbol = symbol?.replace('-', '/') || '';
+
+	const handleSetPriceAlert = () => {
+		const currentProfitPotential = pairData?.opportunities?.[0]?.absRateDifference
+			? pairData.opportunities[0].absRateDifference * 100
+			: 0;
+
+		const suggestedThreshold = Math.max(0.01, Math.min(0.1, currentProfitPotential * 0.5));
+
+		navigateToCreateNotification(navigate, location.pathname, pairSymbol, suggestedThreshold);
+	};
 
 	useEffect(() => {
 		const fetchData = async (isInitialLoad = true) => {
@@ -58,7 +69,10 @@ const PairDetailsPage: React.FC = () => {
 				<div className="flex items-center justify-between pt-[75px]">
 					<div className="animate-pulse">
 						<div className="h-8 bg-[var(--color-bg-tertiary)] rounded w-24 mb-2"></div>
-						<div className="h-4 bg-[var(--color-bg-tertiary)] rounded w-48"></div>
+						<div className="flex items-center gap-2">
+							<div className="h-4 bg-[var(--color-bg-tertiary)] rounded w-32"></div>
+							<div className="h-4 bg-[var(--color-bg-tertiary)] rounded w-16"></div>
+						</div>
 					</div>
 					<div className="animate-pulse">
 						<div className="h-4 bg-[var(--color-bg-tertiary)] rounded w-20 mb-1"></div>
@@ -146,6 +160,7 @@ const PairDetailsPage: React.FC = () => {
 				description="Get notified when profit exceeds threshold"
 				buttonText="Setup"
 				showChevron={false}
+				onClick={handleSetPriceAlert}
 			/>
 
 			<ActionCard
