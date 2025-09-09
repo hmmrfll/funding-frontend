@@ -1,9 +1,8 @@
-// src/blocs/NotificationsListBlock.tsx
 import React from 'react';
 import SquircleWrap from '../components/SquircleWrap';
 import Skeleton from '../components/Skeleton';
 import NotificationItem from '../components/NotificationItem';
-import type { NotificationRule } from '../types/Shared';
+import type { NotificationRule } from '../types/INotifications';
 
 interface NotificationsListBlockProps {
 	notifications: NotificationRule[];

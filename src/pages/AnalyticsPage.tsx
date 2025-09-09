@@ -2,8 +2,7 @@ import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useBackButton } from '../hooks/useBackButton';
 import { navigateBack } from '../utils/navigationUtils';
-import { getFundingRatesComparison } from '../service/arbitrageService';
-import type { FundingRatesComparison } from '../service/arbitrageService';
+import { useFundingRatesComparison } from '../hooks/useQuery/useArbitrage';
 import type { SortOption, FilterState } from '../types/SearchPanel';
 import { DEFAULT_FILTERS } from '../types/SearchPanel';
 import { fullScreenPaddingTop } from '../utils/isMobile';
@@ -17,48 +16,19 @@ import ErrorBlock from '../blocs/ErrorBlock';
 const AnalyticsPage: React.FC = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
-	const [data, setData] = useState<FundingRatesComparison | null>(null);
-	const [loading, setLoading] = useState(true);
-	const [refreshing, setRefreshing] = useState(false);
-	const [error, setError] = useState<string | null>(null);
 	const [sortBy, setSortBy] = useState<SortOption>('profit_desc');
 	const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
 
-	const [displayedPairs, setDisplayedPairs] = useState<
-		Array<{ key: string; pair: any; profit: number; riskLevel: string }>
-	>([]);
-	const [currentPage, setCurrentPage] = useState(0);
+	const [displayedCount, setDisplayedCount] = useState(10);
 	const [loadingMore, setLoadingMore] = useState(false);
-	const [hasMore, setHasMore] = useState(true);
 	const itemsPerPage = 10;
+	const triggerOffset = 5;
 	const observerRef = useRef<IntersectionObserver | null>(null);
 	const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
+	const { data, isLoading: loading, error, isRefetching: refreshing } = useFundingRatesComparison();
+
 	useBackButton(() => navigateBack(navigate));
-
-	useEffect(() => {
-		const fetchData = async (isInitialLoad = true) => {
-			try {
-				if (isInitialLoad) {
-					setLoading(true);
-				} else {
-					setRefreshing(true);
-				}
-
-				const result = await getFundingRatesComparison();
-				setData(result);
-			} catch (err) {
-				setError(err instanceof Error ? err.message : 'Failed to fetch analytics data');
-			} finally {
-				setLoading(false);
-				setRefreshing(false);
-			}
-		};
-
-		fetchData(true);
-		const interval = setInterval(() => fetchData(false), 30000);
-		return () => clearInterval(interval);
-	}, []);
 
 	const handlePairClick = (symbol: string) => {
 		handlePairClickUtil(symbol, navigate, location.pathname);
@@ -127,31 +97,28 @@ const AnalyticsPage: React.FC = () => {
 		return pairs;
 	}, [data, filters, sortBy]);
 
+	const displayedPairs = useMemo(() => {
+		return allFilteredAndSortedPairs.slice(0, displayedCount);
+	}, [allFilteredAndSortedPairs, displayedCount]);
+
+	const hasMore = displayedCount < allFilteredAndSortedPairs.length;
+
 	const loadMorePairs = useCallback(() => {
 		if (loadingMore || !hasMore) return;
 
 		setLoadingMore(true);
 
-		const nextPage = currentPage + 1;
-		const startIndex = nextPage * itemsPerPage;
-		const endIndex = startIndex + itemsPerPage;
-		const nextPagePairs = allFilteredAndSortedPairs.slice(startIndex, endIndex);
-
-		if (nextPagePairs.length === 0) {
-			setHasMore(false);
-		} else {
-			setDisplayedPairs((prev) => [...prev, ...nextPagePairs]);
-			setCurrentPage(nextPage);
-		}
-
-		setLoadingMore(false);
-	}, [allFilteredAndSortedPairs, currentPage, itemsPerPage, loadingMore, hasMore]);
+		setTimeout(() => {
+			setDisplayedCount((prev) => {
+				const newCount = Math.min(prev + itemsPerPage, allFilteredAndSortedPairs.length);
+				return newCount;
+			});
+			setLoadingMore(false);
+		}, 300);
+	}, [loadingMore, hasMore, itemsPerPage, allFilteredAndSortedPairs.length]);
 
 	useEffect(() => {
-		const firstPagePairs = allFilteredAndSortedPairs.slice(0, itemsPerPage);
-		setDisplayedPairs(firstPagePairs);
-		setCurrentPage(0);
-		setHasMore(allFilteredAndSortedPairs.length > itemsPerPage);
+		setDisplayedCount(itemsPerPage);
 	}, [allFilteredAndSortedPairs, itemsPerPage]);
 
 	useEffect(() => {
@@ -161,11 +128,16 @@ const AnalyticsPage: React.FC = () => {
 
 		observerRef.current = new IntersectionObserver(
 			(entries) => {
-				if (entries[0].isIntersecting && hasMore && !loadingMore) {
+				const entry = entries[0];
+
+				if (entry.isIntersecting && hasMore && !loadingMore) {
 					loadMorePairs();
 				}
 			},
-			{ threshold: 0.1 },
+			{
+				threshold: 0.1,
+				rootMargin: '100px',
+			},
 		);
 
 		if (loadMoreRef.current) {
@@ -207,7 +179,7 @@ const AnalyticsPage: React.FC = () => {
 	}
 
 	if (error) {
-		return <ErrorBlock error={error} />;
+		return <ErrorBlock error={error instanceof Error ? error.message : 'Failed to fetch analytics data'} />;
 	}
 
 	if (!data) {
@@ -256,29 +228,30 @@ const AnalyticsPage: React.FC = () => {
 					/>
 				) : (
 					<>
-						{displayedPairs.map(({ key, pair }) => (
-							<PairCard
-								key={key}
-								pair={[key, pair]}
-								opportunities={data.opportunities || []}
-								onClick={handlePairClick}
-							/>
+						{displayedPairs.map(({ key, pair }, index) => (
+							<React.Fragment key={key}>
+								<PairCard
+									pair={[key, pair]}
+									opportunities={data.opportunities || []}
+									onClick={handlePairClick}
+								/>
+
+								{hasMore && index === displayedPairs.length - triggerOffset && (
+									<div
+										ref={loadMoreRef}
+										className="h-1 w-full"
+										style={{ visibility: 'hidden' }}
+									/>
+								)}
+							</React.Fragment>
 						))}
 
-						{/* Индикатор загрузки */}
 						{loadingMore && (
 							<div className="flex justify-center py-4">
 								<div className="w-6 h-6 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin"></div>
 							</div>
 						)}
 
-						{/* Скрытый элемент для Intersection Observer */}
-						<div
-							ref={loadMoreRef}
-							className="h-1"
-						/>
-
-						{/* Сообщение о том, что больше нет данных */}
 						{!hasMore && displayedPairs.length > 0 && (
 							<div className="text-center text-[var(--color-text-tertiary)] text-sm py-4">No more pairs to load</div>
 						)}

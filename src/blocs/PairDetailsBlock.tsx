@@ -1,45 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import SquircleWrap from '../components/SquircleWrap';
 import PairCard from '../components/PairCard';
 import ActionCard from '../components/ActionCard';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { getFundingRatesComparison } from '../service/arbitrageService';
-import type { FundingRatesComparison } from '../service/arbitrageService';
+import { useFundingRatesComparison } from '../hooks/useQuery/useArbitrage';
 import { getProfitPotential, handlePairClick as handlePairClickUtil } from '../utils/arbitrageUtils';
 
 const PairDetailsBlock: React.FC = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
-	const [data, setData] = useState<FundingRatesComparison | null>(null);
-	const [loading, setLoading] = useState(true);
-	const [refreshing, setRefreshing] = useState(false);
-	const [error, setError] = useState<string | null>(null);
 
-	useEffect(() => {
-		const fetchData = async (isInitialLoad = true) => {
-			try {
-				if (isInitialLoad) {
-					setLoading(true);
-				} else {
-					setRefreshing(true);
-				}
-
-				const result = await getFundingRatesComparison();
-				setData(result);
-			} catch (err) {
-				setError(err instanceof Error ? err.message : 'Failed to fetch data');
-			} finally {
-				setLoading(false);
-				setRefreshing(false);
-			}
-		};
-
-		fetchData(true);
-
-		const interval = setInterval(() => fetchData(false), 30000);
-
-		return () => clearInterval(interval);
-	}, []);
+	const { data, isLoading: loading, error, isRefetching: refreshing } = useFundingRatesComparison();
 
 	const handlePairClick = (symbol: string) => {
 		handlePairClickUtil(symbol, navigate, location.pathname);
@@ -82,7 +53,9 @@ const PairDetailsBlock: React.FC = () => {
 					<h2 className="font-secondary-bold text-[var(--color-text)]">Funding Rates Monitor</h2>
 					<span className="text-xs text-red-500">Error</span>
 				</div>
-				<div className="text-red-500 text-center py-4">{error}</div>
+				<div className="text-red-500 text-center py-4">
+					{error instanceof Error ? error.message : 'Failed to fetch data'}
+				</div>
 			</div>
 		);
 	}

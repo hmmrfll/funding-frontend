@@ -1,4 +1,4 @@
-import type { NotificationRule, TradingPair } from '../types/Shared';
+import type { NotificationRule, TradingPair } from '../types/INotifications';
 import fetchWithAuth from './fetchWithAuth';
 
 class NotificationsService {
@@ -157,5 +157,4 @@ class NotificationsService {
 	}
 }
 
-export const notificationsService = new NotificationsService();
-export default notificationsService;
+export default new NotificationsService();

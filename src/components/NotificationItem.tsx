@@ -1,7 +1,6 @@
-// src/components/NotificationItem.tsx
 import React from 'react';
 import SquircleWrap from './SquircleWrap';
-import type { NotificationRule } from '../types/Shared';
+import type { NotificationRule } from '../types/INotifications';
 import notificationsService from '../service/notificationsService';
 
 interface NotificationItemProps {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useBackButton } from '../hooks/useBackButton';
 import { navigateToCreateNotification, navigateBack } from '../utils/navigationUtils';
@@ -7,48 +7,26 @@ import ActionCard from '../components/ActionCard';
 import NotificationsListBlock from '../blocs/NotificationsListBlock';
 import { useAuth } from '../providers/AuthProvider';
 import useTelegram from '../hooks/useTelegram';
-import type { NotificationRule } from '../types/Shared';
-import notificationsService from '../service/notificationsService';
+import {
+	useNotifications,
+	useUpdateNotification,
+	useDeleteNotification,
+	useSendTestNotification,
+} from '../hooks/useQuery/useNotifications';
 
 const NotificationsSettingsPage: React.FC = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const { user, isAuthenticated } = useAuth();
 	const { hapticTrigger } = useTelegram();
-	const [notifications, setNotifications] = useState<NotificationRule[]>([]);
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState<string | null>(null);
 	const [testNotificationSent, setTestNotificationSent] = useState(false);
 
 	useBackButton(() => navigateBack(navigate));
 
-	const loadNotifications = useCallback(async () => {
-		if (!user?.id || !isAuthenticated) {
-			setLoading(false);
-			return;
-		}
-
-		try {
-			setLoading(true);
-			setError(null);
-
-			const data = await notificationsService.getNotifications(user.id);
-			setNotifications(data);
-		} catch (error) {
-			console.error('Failed to load notifications:', error);
-			if (error instanceof Error) {
-				setError(error.message);
-			} else {
-				setError('Unable to load notifications. Please try again.');
-			}
-		} finally {
-			setLoading(false);
-		}
-	}, [user?.id, isAuthenticated]);
-
-	useEffect(() => {
-		loadNotifications();
-	}, [loadNotifications]);
+	const { data: notifications = [], isLoading: loading, error } = useNotifications(user?.id || '');
+	const updateNotificationMutation = useUpdateNotification();
+	const deleteNotificationMutation = useDeleteNotification();
+	const sendTestNotificationMutation = useSendTestNotification();
 
 	const handleToggleNotification = async (id: string) => {
 		if (!user?.id) return;
@@ -59,18 +37,13 @@ const NotificationsSettingsPage: React.FC = () => {
 			const notification = notifications.find((n) => n.id === id);
 			if (!notification) return;
 
-			const updatedNotification = await notificationsService.updateNotification(user.id, id, {
-				enabled: !notification.enabled,
+			await updateNotificationMutation.mutateAsync({
+				userId: user.id,
+				id,
+				updates: { enabled: !notification.enabled },
 			});
-
-			setNotifications((prev) => prev.map((n) => (n.id === id ? updatedNotification : n)));
 		} catch (error) {
 			console.error('Failed to toggle notification:', error);
-			if (error instanceof Error) {
-				setError(error.message);
-			} else {
-				setError('Failed to update notification. Please try again.');
-			}
 		}
 	};
 
@@ -80,15 +53,12 @@ const NotificationsSettingsPage: React.FC = () => {
 		try {
 			hapticTrigger('medium');
 
-			await notificationsService.deleteNotification(user.id, id);
-			setNotifications((prev) => prev.filter((n) => n.id !== id));
+			await deleteNotificationMutation.mutateAsync({
+				userId: user.id,
+				id,
+			});
 		} catch (error) {
 			console.error('Failed to delete notification:', error);
-			if (error instanceof Error) {
-				setError(error.message);
-			} else {
-				setError('Failed to delete notification. Please try again.');
-			}
 		}
 	};
 
@@ -97,18 +67,13 @@ const NotificationsSettingsPage: React.FC = () => {
 
 		try {
 			hapticTrigger('medium');
-			await notificationsService.sendTestNotification(user.id);
+			await sendTestNotificationMutation.mutateAsync(user.id);
 
 			setTestNotificationSent(true);
 			hapticTrigger('heavy');
 			setTimeout(() => setTestNotificationSent(false), 3000);
 		} catch (error) {
 			console.error('Failed to send test notification:', error);
-			if (error instanceof Error) {
-				setError(error.message);
-			} else {
-				setError('Failed to send test notification. Please try again.');
-			}
 		}
 	};
 
@@ -128,9 +93,9 @@ const NotificationsSettingsPage: React.FC = () => {
 					<div className="text-center">
 						<div className="text-red-600 dark:text-red-400 text-lg mb-2">⚠️</div>
 						<div className="text-red-800 dark:text-red-200 font-medium mb-2">Error loading notifications</div>
-						<div className="text-red-600 dark:text-red-400 text-sm mb-4">{error}</div>
+						<div className="text-red-600 dark:text-red-400 text-sm mb-4">{error?.message || 'Unknown error'}</div>
 						<button
-							onClick={loadNotifications}
+							onClick={() => window.location.reload()}
 							className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
 						>
 							Try Again
@@ -160,10 +125,10 @@ const NotificationsSettingsPage: React.FC = () => {
 						<div className="text-orange-600 dark:text-orange-400 text-lg">⚠️</div>
 						<div className="flex-1">
 							<div className="text-orange-800 dark:text-orange-200 font-medium">Warning</div>
-							<div className="text-orange-600 dark:text-orange-400 text-sm">{error}</div>
+							<div className="text-orange-600 dark:text-orange-400 text-sm">{error?.message || 'Unknown error'}</div>
 						</div>
 						<button
-							onClick={() => setError(null)}
+							onClick={() => window.location.reload()}
 							className="text-orange-600 dark:text-orange-400 hover:text-orange-800 dark:hover:text-orange-200"
 						>
 							✕

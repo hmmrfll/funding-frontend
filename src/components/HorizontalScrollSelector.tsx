@@ -1,4 +1,3 @@
-// src/components/HorizontalScrollSelector.tsx
 import React from 'react';
 
 export interface SelectorOption {

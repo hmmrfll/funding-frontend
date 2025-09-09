@@ -1,4 +1,4 @@
-import { useAuthCallback } from '../services/authService';
+import { useAuthCallback } from '../service/authService';
 import Skeleton from '../components/Skeleton';
 
 const AuthPage = () => {

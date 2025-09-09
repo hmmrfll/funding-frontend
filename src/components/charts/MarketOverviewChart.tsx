@@ -1,4 +1,3 @@
-// src/components/charts/MarketOverviewChart.tsx
 import React from 'react';
 import Chart from './Chart';
 import type { ChartData, ChartOptions } from 'chart.js';

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import './index.css';
 
 import useTelegram from './hooks/useTelegram';
@@ -14,6 +15,21 @@ import NotificationsSettingsPage from './pages/NotificationsSettingsPage';
 import CreateNotificationPage from './pages/CreateNotificationPage';
 import TelegramOnlyPage from './pages/TelegramOnlyPage';
 
+const queryClient = new QueryClient({
+	defaultOptions: {
+		queries: {
+			staleTime: 5 * 60 * 1000,
+			gcTime: 10 * 60 * 1000,
+			retry: 3,
+			refetchOnWindowFocus: false,
+			refetchOnReconnect: true,
+		},
+		mutations: {
+			retry: 1,
+		},
+	},
+});
+
 function App() {
 	const { theme } = useTelegram();
 	const { isNotInTelegram } = useAuth();
@@ -23,11 +39,13 @@ function App() {
 	}
 
 	return (
-		<main className={theme}>
-			<div className="container p-[24px]">
-				<AppRoutes />
-			</div>
-		</main>
+		<QueryClientProvider client={queryClient}>
+			<main className={theme}>
+				<div className="container p-[24px]">
+					<AppRoutes />
+				</div>
+			</main>
+		</QueryClientProvider>
 	);
 }
 

@@ -1,4 +1,3 @@
-// src/components/charts/AreaChart.tsx
 import React from 'react';
 import Chart from './Chart';
 import type { ChartData, ChartOptions } from 'chart.js';
@@ -35,7 +34,7 @@ const AreaChart: React.FC<AreaChartProps> = ({
 				borderColor: color,
 				backgroundColor: color.replace('rgb', 'rgba').replace(')', ', 0.1)'),
 				borderWidth: 2,
-				fill: true, // Это делает график area chart
+				fill: true,
 				tension: 0.4,
 				pointRadius: 0,
 				pointHoverRadius: 4,

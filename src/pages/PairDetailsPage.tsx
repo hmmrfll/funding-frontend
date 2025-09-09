@@ -9,22 +9,19 @@ import ActionCard from '../components/ActionCard';
 import ErrorBlock from '../blocs/ErrorBlock';
 import ArbitrageOpportunitiesList from '../components/ArbitrageOpportunitiesList';
 import Skeleton from '../components/Skeleton';
-import { getPairDetails } from '../service/arbitrageService';
-import type { PairDetails } from '../service/arbitrageService';
+import { usePairDetails } from '../hooks/useQuery/useArbitrage';
 
 const PairDetailsPage: React.FC = () => {
 	const { symbol } = useParams<{ symbol: string }>();
 	const navigate = useNavigate();
 	const location = useLocation();
-	const [pairData, setPairData] = useState<PairDetails | null>(null);
-	const [loading, setLoading] = useState(true);
-	const [refreshing, setRefreshing] = useState(false);
-	const [error, setError] = useState<string | null>(null);
 	const [showOpportunities, setShowOpportunities] = useState(false);
 
 	useBackButton(() => navigateBack(navigate));
 
 	const pairSymbol = symbol?.replace('-', '/') || '';
+
+	const { data: pairData, isLoading: loading, error, isRefetching: refreshing } = usePairDetails(pairSymbol, 7);
 
 	const handleSetPriceAlert = () => {
 		const currentProfitPotential = pairData?.opportunities?.[0]?.absRateDifference
@@ -35,34 +32,6 @@ const PairDetailsPage: React.FC = () => {
 
 		navigateToCreateNotification(navigate, location.pathname, pairSymbol, suggestedThreshold);
 	};
-
-	useEffect(() => {
-		const fetchData = async (isInitialLoad = true) => {
-			if (!pairSymbol) return;
-
-			try {
-				if (isInitialLoad) {
-					setLoading(true);
-				} else {
-					setRefreshing(true);
-				}
-
-				const result = await getPairDetails(pairSymbol, 7);
-				setPairData(result);
-			} catch (err) {
-				setError(err instanceof Error ? err.message : 'Failed to fetch pair details');
-			} finally {
-				setLoading(false);
-				setRefreshing(false);
-			}
-		};
-
-		fetchData(true);
-
-		const interval = setInterval(() => fetchData(false), 30000);
-
-		return () => clearInterval(interval);
-	}, [pairSymbol]);
 
 	if (loading && !pairData) {
 		return (
@@ -112,21 +81,12 @@ const PairDetailsPage: React.FC = () => {
 					showChevron={false}
 					onClick={handleSetPriceAlert}
 				/>
-
-				<ActionCard
-					icon="📊"
-					title="View All Opportunities"
-					description="Browse all available arbitrage opportunities"
-					buttonText={showOpportunities ? 'Hide' : 'Show'}
-					showChevron={false}
-					onClick={() => setShowOpportunities(!showOpportunities)}
-				/>
 			</div>
 		);
 	}
 
 	if (error) {
-		return <ErrorBlock error={error} />;
+		return <ErrorBlock error={error instanceof Error ? error.message : 'Failed to fetch pair details'} />;
 	}
 
 	if (!pairData) {
@@ -180,15 +140,6 @@ const PairDetailsPage: React.FC = () => {
 				buttonText="Setup"
 				showChevron={false}
 				onClick={handleSetPriceAlert}
-			/>
-
-			<ActionCard
-				icon="📊"
-				title="View All Opportunities"
-				description="Browse all available arbitrage opportunities"
-				buttonText={showOpportunities ? 'Hide' : 'Show'}
-				showChevron={false}
-				onClick={() => setShowOpportunities(!showOpportunities)}
 			/>
 
 			{showOpportunities && (

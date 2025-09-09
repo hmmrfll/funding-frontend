@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useBackButton } from '../hooks/useBackButton';
 import { navigateBack } from '../utils/navigationUtils';
@@ -9,21 +9,22 @@ import Select from '../components/inputs/Select';
 import ActionCard from '../components/ActionCard';
 import { useAuth } from '../providers/AuthProvider';
 import useTelegram from '../hooks/useTelegram';
-import type { TradingPair } from '../types/Shared';
+import { useTradingPairs, useCreateNotification } from '../hooks/useQuery/useNotifications';
 import notificationsService from '../service/notificationsService';
 
 const CreateNotificationPage: React.FC = () => {
 	const navigate = useNavigate();
 	const [searchParams] = useSearchParams();
-	const { user, isAuthenticated } = useAuth();
+	const { user } = useAuth();
 	const { hapticTrigger } = useTelegram();
 	const [type, setType] = useState<'global' | 'pair'>('global');
 	const [selectedPair, setSelectedPair] = useState<string>('');
 	const [threshold, setThreshold] = useState<number>(0.01);
 	const [saving, setSaving] = useState(false);
 	const [error, setError] = useState<string | null>(null);
-	const [tradingPairs, setTradingPairs] = useState<TradingPair[]>([]);
-	const [pairsLoading, setPairsLoading] = useState(false);
+
+	const { data: tradingPairs = [], isLoading: pairsLoading, error: pairsError } = useTradingPairs();
+	const createNotificationMutation = useCreateNotification();
 
 	useBackButton(() => navigateBack(navigate));
 
@@ -44,30 +45,11 @@ const CreateNotificationPage: React.FC = () => {
 		}
 	}, [searchParams]);
 
-	const loadTradingPairs = useCallback(async () => {
-		try {
-			setPairsLoading(true);
-			setError(null);
-
-			const pairs = await notificationsService.getTradingPairs();
-			setTradingPairs(pairs);
-		} catch (error) {
-			console.error('Failed to load trading pairs:', error);
-			if (error instanceof Error) {
-				setError(error.message);
-			} else {
-				setError('Unable to load trading pairs. Please try again.');
-			}
-		} finally {
-			setPairsLoading(false);
-		}
-	}, []);
-
 	useEffect(() => {
-		if (isAuthenticated) {
-			loadTradingPairs();
+		if (pairsError) {
+			setError(pairsError instanceof Error ? pairsError.message : 'Unable to load trading pairs. Please try again.');
 		}
-	}, [isAuthenticated, loadTradingPairs]);
+	}, [pairsError]);
 
 	const handleSave = async () => {
 		if (!user?.id) return;
@@ -77,14 +59,17 @@ const CreateNotificationPage: React.FC = () => {
 			setError(null);
 			hapticTrigger('medium');
 
-			await notificationsService.createNotification(user.id, {
-				type,
-				...(type === 'pair' && {
-					symbol: selectedPair,
-					symbolLabel: tradingPairs.find((p) => p.symbol === selectedPair)?.label,
-				}),
-				threshold,
-				enabled: true,
+			await createNotificationMutation.mutateAsync({
+				userId: user.id,
+				notification: {
+					type,
+					...(type === 'pair' && {
+						symbol: selectedPair,
+						symbolLabel: tradingPairs.find((p) => p.symbol === selectedPair)?.label,
+					}),
+					threshold,
+					enabled: true,
+				},
 			});
 
 			hapticTrigger('heavy');
@@ -111,7 +96,7 @@ const CreateNotificationPage: React.FC = () => {
 
 	const canSave = type === 'global' || (type === 'pair' && selectedPair);
 
-	if (error && tradingPairs.length === 0) {
+	if (pairsError && tradingPairs.length === 0) {
 		return (
 			<div className="flex flex-col gap-6 pb-6">
 				<div className={`flex items-start justify-between gap-4 ${fullScreenPaddingTop}`}>
@@ -125,9 +110,11 @@ const CreateNotificationPage: React.FC = () => {
 					<div className="text-center">
 						<div className="text-red-600 dark:text-red-400 text-lg mb-2">⚠️</div>
 						<div className="text-red-800 dark:text-red-200 font-medium mb-2">Error loading data</div>
-						<div className="text-red-600 dark:text-red-400 text-sm mb-4">{error}</div>
+						<div className="text-red-600 dark:text-red-400 text-sm mb-4">
+							{pairsError instanceof Error ? pairsError.message : 'Unable to load trading pairs. Please try again.'}
+						</div>
 						<button
-							onClick={loadTradingPairs}
+							onClick={() => window.location.reload()}
 							className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
 						>
 							Try Again

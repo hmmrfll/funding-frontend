@@ -1,4 +1,3 @@
-// src/components/TimeframeSelector.tsx
 import React from 'react';
 
 export type Timeframe = '1h' | '4h' | '24h' | '7d';

@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect } from 'react';
 import type { ReactNode } from 'react';
-import { useUser } from '../hooks/useQuery/useUser';
+import { useCurrentUser } from '../hooks/useQuery/useUser';
 import { useTelegramCheck } from '../hooks/useTelegramCheck';
 import { TelegramInit } from '../utils/TelegramInit';
 
@@ -28,7 +28,7 @@ interface AuthProviderProps {
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
 	const { isTelegramReady, isNotInTelegram, isLoading: telegramLoading } = useTelegramCheck();
-	const { user, isLoading: userLoading, error } = useUser();
+	const { data: user, isLoading: userLoading, error } = useCurrentUser();
 
 	useEffect(() => {
 		const initTelegram = async () => {

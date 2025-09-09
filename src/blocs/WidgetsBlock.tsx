@@ -3,35 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../providers/AuthProvider';
 import ArbitrageBackground from '../assets/ArbitrageBackground';
 import NotificationsBackground from '../assets/NotificationsBackground';
-import notificationsService from '../service/notificationsService';
-import { useState, useEffect } from 'react';
-import type { NotificationRule } from '../types/Shared';
+import { useNotifications } from '../hooks/useQuery/useNotifications';
 
 const DashboardBlock = () => {
 	const navigate = useNavigate();
 	const { user, isAuthenticated } = useAuth();
-	const [notifications, setNotifications] = useState<NotificationRule[]>([]);
-	const [notificationsLoading, setNotificationsLoading] = useState(true);
 
-	useEffect(() => {
-		const loadNotifications = async () => {
-			if (!user?.id || !isAuthenticated) {
-				setNotificationsLoading(false);
-				return;
-			}
-
-			try {
-				const data = await notificationsService.getNotifications(user.id);
-				setNotifications(data);
-			} catch (error) {
-				console.error('Failed to load notifications:', error);
-			} finally {
-				setNotificationsLoading(false);
-			}
-		};
-
-		loadNotifications();
-	}, [user?.id, isAuthenticated]);
+	const { data: notifications = [], isLoading: notificationsLoading } = useNotifications(user?.id || '');
 
 	const notificationsActive = notifications.some((n) => n.enabled);
 

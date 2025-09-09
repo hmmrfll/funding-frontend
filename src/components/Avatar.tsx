@@ -48,17 +48,15 @@ const Avatar: React.FC<AvatarProps> = ({
 
 	if (isLoading) {
 		return (
-			<Skeleton
-				cornerRadius={size / 2}
-				colorMode="gray"
-				width={size}
-				height={size}
-				className={className}
-			/>
+			<div
+				className={`rounded-full ${className}`}
+				style={{ width: `${size}px`, height: `${size}px` }}
+			>
+				<Skeleton className="w-full h-full rounded-full" />
+			</div>
 		);
 	}
 
-	// Если нет изображения, показываем fallback
 	if (!image) {
 		return (
 			<div

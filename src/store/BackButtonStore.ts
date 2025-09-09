@@ -1,4 +1,3 @@
-// stores/useBackButtonStore.ts
 import { create } from 'zustand';
 
 type BackButtonStore = {

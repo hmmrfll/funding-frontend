@@ -1,4 +1,3 @@
-// components/BackButtonHandler.tsx
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { useBackButtonStore } from "../store/BackButtonStore";
