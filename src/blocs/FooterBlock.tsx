@@ -2,6 +2,7 @@ import SquircleWrap from '../components/SquircleWrap';
 import GitHubIcon from '../components/GitHubIcon';
 import TelegramIcon from '../components/TelegramIcon';
 import useTelegram from '../hooks/useTelegram';
+import { handleWritePerson } from '../utils/telegramUtils';
 
 const FooterBlock = () => {
 	const { openLink } = useTelegram();
@@ -29,7 +30,7 @@ const FooterBlock = () => {
 
 				<SquircleWrap
 					className="bg-[var(--color-bg-secondary)] p-4 flex items-center gap-3 cursor-pointer hover:bg-[var(--color-border)] transition-colors"
-					onClick={() => handleLinkClick('https://t.me/vm4sto')}
+					onClick={() => handleWritePerson('vm4sto', null)}
 				>
 					<div className="text-2xl">📢</div>
 					<div className="flex-1 min-w-0">
