@@ -19,7 +19,7 @@ const Dropdown = (props: Props) => {
 				onClick={onClose}
 				className={`fixed inset-0 transition-all duration-[250ms] ease-out backdrop-blur-[4px] ${
 					isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
-				}`}
+				} z-1000`}
 				style={{ backgroundColor: 'rgba(0, 0, 0, 0.12)' }}
 			/>
 

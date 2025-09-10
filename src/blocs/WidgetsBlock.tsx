@@ -30,7 +30,7 @@ const DashboardBlock = () => {
 				<ArbitrageBackground />
 
 				<div className="flex flex-col z-10">
-					<div className="font-tertiary-bold text-[var(--color-text)] text-lg leading-tight">Arbitrage</div>
+					<div className="font-tertiary-bold text-[var(--color-text)] text-lg leading-tight">Dashboards</div>
 					<div className="font-tertiary-bold text-[var(--color-text)] text-lg leading-tight">Metrics</div>
 				</div>
 

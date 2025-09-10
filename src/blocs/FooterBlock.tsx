@@ -21,7 +21,7 @@ const FooterBlock = () => {
 					<div className="text-2xl">⚡</div>
 					<div className="flex-1 min-w-0">
 						<div className="font-tertiary-bold text-[var(--color-text)] text-sm">GitHub</div>
-						<div className="text-xs text-[var(--color-text-tertiary)]">Hard & Work</div>
+						<div className="text-xs text-[var(--color-text-tertiary)]">Open source</div>
 					</div>
 					<div className="text-[var(--color-text-tertiary)] flex-shrink-0">
 						<GitHubIcon />
@@ -35,7 +35,7 @@ const FooterBlock = () => {
 					<div className="text-2xl">📢</div>
 					<div className="flex-1 min-w-0">
 						<div className="font-tertiary-bold text-[var(--color-text)] text-sm">Telegram</div>
-						<div className="text-xs text-[var(--color-text-tertiary)]">Personal & Achievements</div>
+						<div className="text-xs text-[var(--color-text-tertiary)]">Developer channel</div>
 					</div>
 					<div className="text-[var(--color-text-tertiary)] flex-shrink-0">
 						<TelegramIcon />
@@ -45,7 +45,7 @@ const FooterBlock = () => {
 
 			<div className="text-center py-2">
 				<div className="text-xs text-[var(--color-text-tertiary)]">Funding Arbitrage Bot v1.0</div>
-				<div className="text-xs text-[var(--color-text-tertiary)] mt-1">Made with ❤️ for cp0x competitions</div>
+				<div className="text-xs text-[var(--color-text-tertiary)] mt-1">Made with ❤️ for cp0x and Extended competitions</div>
 			</div>
 		</div>
 	);

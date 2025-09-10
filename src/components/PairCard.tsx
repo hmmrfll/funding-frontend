@@ -1,7 +1,7 @@
 import React from 'react';
 import SquircleWrap from './SquircleWrap';
 import ChevronRight from '../assets/ChevronRight.tsx';
-import type { ArbitrageOpportunity } from '../service/arbitrageService';
+import type { ArbitrageOpportunity } from '../types/IArbitrage.ts';
 import { getProfitPotential } from '../utils/arbitrageUtils';
 
 type PairData = {
