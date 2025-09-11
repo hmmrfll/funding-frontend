@@ -16,3 +16,15 @@ export interface MarketOverviewPoint {
 	avgSpread: number;
 	maxProfitPotential: number;
 }
+
+export interface ActivityByTimeData {
+	hour: number;
+	count: number;
+}
+
+export interface ProfitabilityByTimeData {
+	hour: number;
+	maxProfit: number;
+	avgProfit: number;
+	medianProfit: number;
+}

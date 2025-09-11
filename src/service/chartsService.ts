@@ -1,8 +1,11 @@
 import fetchWithAuth from './fetchWithAuth';
-import type { MarketSummary, MarketOverviewPoint } from '../types/ICharts';
+import type { MarketSummary, MarketOverviewPoint, ActivityByTimeData, ProfitabilityByTimeData } from '../types/ICharts';
 
-export const getMarketSummary = async (): Promise<MarketSummary> => {
-	const data = await fetchWithAuth('/charts/market-summary');
+export const getMarketSummary = async (timeframe: '1h' | '4h' | '24h' | '7d' = '24h'): Promise<MarketSummary> => {
+	const params = new URLSearchParams();
+	params.append('timeframe', timeframe);
+
+	const data = await fetchWithAuth(`/charts/market-summary?${params.toString()}`);
 	return data;
 };
 
@@ -13,6 +16,26 @@ export const getMarketOverview = async (
 	params.append('timeframe', timeframe);
 
 	const data = await fetchWithAuth(`/charts/market-overview?${params.toString()}`);
+	return data;
+};
+
+export const getActivityByTime = async (
+	timeframe: '1h' | '4h' | '24h' | '7d' = '24h',
+): Promise<ActivityByTimeData[]> => {
+	const params = new URLSearchParams();
+	params.append('timeframe', timeframe);
+
+	const data = await fetchWithAuth(`/charts/activity-by-time?${params.toString()}`);
+	return data;
+};
+
+export const getProfitabilityByTime = async (
+	timeframe: '1h' | '4h' | '24h' | '7d' = '24h',
+): Promise<ProfitabilityByTimeData[]> => {
+	const params = new URLSearchParams();
+	params.append('timeframe', timeframe);
+
+	const data = await fetchWithAuth(`/charts/profitability-by-time?${params.toString()}`);
 	return data;
 };
 

@@ -45,7 +45,9 @@ const FooterBlock = () => {
 
 			<div className="text-center py-2">
 				<div className="text-xs text-[var(--color-text-tertiary)]">Funding Arbitrage Bot v1.0</div>
-				<div className="text-xs text-[var(--color-text-tertiary)] mt-1">Made with ❤️ for cp0x and Extended competitions</div>
+				<div className="text-xs text-[var(--color-text-tertiary)] mt-1">
+					Made with ❤️ for cp0x and Extended competitions
+				</div>
 			</div>
 		</div>
 	);

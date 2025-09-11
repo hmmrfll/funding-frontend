@@ -3,23 +3,36 @@ import { useNavigate } from 'react-router-dom';
 import { useBackButton } from '../hooks/useBackButton';
 import { fullScreenPaddingTop } from '../utils/isMobile';
 import MarketOverviewChart from '../components/charts/MarketOverviewChart';
+import ActivityByTimeChart from '../components/charts/ActivityByTimeChart';
+import ProfitabilityByTimeChart from '../components/charts/ProfitabilityByTimeChart';
 import SquircleWrap from '../components/SquircleWrap';
 import HorizontalScrollSelector from '../components/HorizontalScrollSelector';
 import TimeframeSelector from '../components/TimeframeSelector';
-import { useMarketSummary, useMarketOverview } from '../hooks/useQuery/useCharts';
+import {
+	useMarketSummary,
+	useMarketOverview,
+	useActivityByTime,
+	useProfitabilityByTime,
+} from '../hooks/useQuery/useCharts';
 
 const DashboardsPage: React.FC = () => {
 	const navigate = useNavigate();
 	const [timeframe, setTimeframe] = useState<'1h' | '4h' | '24h' | '7d'>('24h');
-	const [selectedChart, setSelectedChart] = useState<'overview' | 'funding'>('overview');
+	const [selectedChart, setSelectedChart] = useState<'overview' | 'activity' | 'profitability'>('overview');
 
 	useBackButton(() => navigate('/'));
 
-	const { data: marketSummary, isLoading: summaryLoading, error: summaryError } = useMarketSummary();
+	const { data: marketSummary, isLoading: summaryLoading, error: summaryError } = useMarketSummary(timeframe);
 	const { data: marketOverviewData, isLoading: overviewLoading, error: overviewError } = useMarketOverview(timeframe);
+	const { data: activityData, isLoading: activityLoading, error: activityError } = useActivityByTime(timeframe);
+	const {
+		data: profitabilityData,
+		isLoading: profitabilityLoading,
+		error: profitabilityError,
+	} = useProfitabilityByTime(timeframe);
 
-	const loading = summaryLoading || overviewLoading;
-	const error = summaryError || overviewError;
+	const loading = summaryLoading || overviewLoading || activityLoading || profitabilityLoading;
+	const error = summaryError || overviewError || activityError || profitabilityError;
 
 	const formatCurrency = (amount: number): string => {
 		return new Intl.NumberFormat('en-US', {
@@ -42,6 +55,22 @@ const DashboardsPage: React.FC = () => {
 						data={marketOverviewData || []}
 						loading={loading}
 						title={`Market Overview (${timeframe})`}
+					/>
+				);
+			case 'activity':
+				return (
+					<ActivityByTimeChart
+						data={activityData || []}
+						loading={loading}
+						title={`Activity by Time of Day (${timeframe})`}
+					/>
+				);
+			case 'profitability':
+				return (
+					<ProfitabilityByTimeChart
+						data={profitabilityData || []}
+						loading={loading}
+						title={`Profitability by Time of Day (${timeframe})`}
 					/>
 				);
 			default:
@@ -157,9 +186,13 @@ const DashboardsPage: React.FC = () => {
 					)}
 
 					<HorizontalScrollSelector
-						options={[{ key: 'overview', label: 'Overview', icon: '📊' }]}
+						options={[
+							{ key: 'overview', label: 'Overview', icon: '📊' },
+							{ key: 'activity', label: 'Activity', icon: '🕐' },
+							{ key: 'profitability', label: 'Profitability', icon: '💰' },
+						]}
 						selectedValue={selectedChart}
-						onSelect={(value) => setSelectedChart(value as 'overview' | 'funding')}
+						onSelect={(value) => setSelectedChart(value as 'overview' | 'activity' | 'profitability')}
 					/>
 
 					<div className="flex flex-col gap-6">{renderSelectedChart()}</div>

@@ -7,8 +7,10 @@ export const QUERY_KEYS = {
 
 	// Charts
 	FUNDING_RATE_HISTORY: (symbol?: string, timeframe?: string) => ['funding-rate-history', symbol, timeframe] as const,
-	MARKET_SUMMARY: ['market-summary'] as const,
+	MARKET_SUMMARY: (timeframe: string) => ['market-summary', timeframe] as const,
 	MARKET_OVERVIEW: (timeframe: string) => ['market-overview', timeframe] as const,
+	ACTIVITY_BY_TIME: (timeframe: string) => ['activity-by-time', timeframe] as const,
+	PROFITABILITY_BY_TIME: (timeframe: string) => ['profitability-by-time', timeframe] as const,
 	VOLUME_ANALYSIS: (timeframe: string) => ['volume-analysis', timeframe] as const,
 	FUNDING_RATE_SNAPSHOTS: (symbols?: string[]) => ['funding-rate-snapshots', symbols] as const,
 	ARBITRAGE_METRICS: (timeframe: string) => ['arbitrage-metrics', timeframe] as const,
