@@ -1,5 +1,3 @@
-import useTelegram from '../hooks/useTelegram';
-
 export interface TelegramInitData {
 	query_id?: string;
 	user?: {

@@ -1,9 +1,7 @@
-import { useAuth } from '../providers/AuthProvider';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 
 export const useAuthCallback = () => {
-	const { login } = useAuth();
 	const navigate = useNavigate();
 
 	useEffect(() => {
@@ -11,11 +9,10 @@ export const useAuthCallback = () => {
 		const token = urlParams.get('token');
 
 		if (token) {
-			login(token);
-
-			navigate('/', { replace: true });
-		} else {
-			navigate('/', { replace: true });
+			// TODO: Implement token handling
+			console.log('Token received:', token);
 		}
-	}, [login, navigate]);
+
+		navigate('/', { replace: true });
+	}, [navigate]);
 };

@@ -6,7 +6,7 @@ import type { NotificationRule } from '../../types/INotifications';
 export const useNotifications = (userId: string) => {
 	return useQuery({
 		queryKey: QUERY_KEYS.NOTIFICATIONS(userId),
-		queryFn: () => notificationsService.getNotifications(userId),
+		queryFn: () => notificationsService.getNotifications(),
 		enabled: !!userId,
 		staleTime: 2 * 60 * 1000,
 	});
@@ -25,12 +25,12 @@ export const useCreateNotification = () => {
 
 	return useMutation({
 		mutationFn: ({
-			userId,
+			userId: _userId,
 			notification,
 		}: {
 			userId: string;
 			notification: Omit<NotificationRule, 'id' | 'createdAt'>;
-		}) => notificationsService.createNotification(userId, notification),
+		}) => notificationsService.createNotification(notification),
 		onSuccess: (_, { userId }) => {
 			queryClient.invalidateQueries({ queryKey: QUERY_KEYS.NOTIFICATIONS(userId) });
 		},
@@ -41,8 +41,15 @@ export const useUpdateNotification = () => {
 	const queryClient = useQueryClient();
 
 	return useMutation({
-		mutationFn: ({ userId, id, updates }: { userId: string; id: string; updates: Partial<NotificationRule> }) =>
-			notificationsService.updateNotification(userId, id, updates),
+		mutationFn: ({
+			userId: _userId,
+			id,
+			updates,
+		}: {
+			userId: string;
+			id: string;
+			updates: Partial<NotificationRule>;
+		}) => notificationsService.updateNotification(id, updates),
 		onSuccess: (_, { userId }) => {
 			queryClient.invalidateQueries({ queryKey: QUERY_KEYS.NOTIFICATIONS(userId) });
 		},
@@ -53,7 +60,8 @@ export const useDeleteNotification = () => {
 	const queryClient = useQueryClient();
 
 	return useMutation({
-		mutationFn: ({ userId, id }: { userId: string; id: string }) => notificationsService.deleteNotification(userId, id),
+		mutationFn: ({ userId: _userId, id }: { userId: string; id: string }) =>
+			notificationsService.deleteNotification(id),
 		onSuccess: (_, { userId }) => {
 			queryClient.invalidateQueries({ queryKey: QUERY_KEYS.NOTIFICATIONS(userId) });
 		},
@@ -62,6 +70,6 @@ export const useDeleteNotification = () => {
 
 export const useSendTestNotification = () => {
 	return useMutation({
-		mutationFn: (userId: string) => notificationsService.sendTestNotification(userId),
+		mutationFn: (_userId: string) => notificationsService.sendTestNotification(),
 	});
 };

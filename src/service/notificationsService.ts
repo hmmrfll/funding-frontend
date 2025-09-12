@@ -2,7 +2,7 @@ import type { NotificationRule, TradingPair } from '../types/INotifications';
 import fetchWithAuth from './fetchWithAuth';
 
 class NotificationsService {
-	async getNotifications(userId: string): Promise<NotificationRule[]> {
+	async getNotifications(): Promise<NotificationRule[]> {
 		try {
 			const response = await fetchWithAuth('/notifications/rules');
 			console.log('Raw notifications response:', response);
@@ -19,10 +19,7 @@ class NotificationsService {
 		}
 	}
 
-	async createNotification(
-		userId: string,
-		notification: Omit<NotificationRule, 'id' | 'createdAt'>,
-	): Promise<NotificationRule> {
+	async createNotification(notification: Omit<NotificationRule, 'id' | 'createdAt'>): Promise<NotificationRule> {
 		try {
 			const requestData = {
 				type: notification.type,
@@ -42,7 +39,7 @@ class NotificationsService {
 		}
 	}
 
-	async updateNotification(userId: string, id: string, updates: Partial<NotificationRule>): Promise<NotificationRule> {
+	async updateNotification(id: string, updates: Partial<NotificationRule>): Promise<NotificationRule> {
 		try {
 			const requestData: any = {};
 
@@ -66,7 +63,7 @@ class NotificationsService {
 		}
 	}
 
-	async deleteNotification(userId: string, id: string): Promise<void> {
+	async deleteNotification(id: string): Promise<void> {
 		try {
 			await fetchWithAuth(`/notifications/rules/${id}`, {
 				method: 'DELETE',
@@ -96,7 +93,7 @@ class NotificationsService {
 		}
 	}
 
-	async sendTestNotification(userId: string): Promise<void> {
+	async sendTestNotification(): Promise<void> {
 		try {
 			await fetchWithAuth('/notifications/test', {
 				method: 'POST',

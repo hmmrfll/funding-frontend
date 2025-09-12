@@ -1,4 +1,3 @@
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../providers/AuthProvider';
 import Avatar from '../components/Avatar';
 
@@ -8,18 +7,6 @@ import Skeleton from '../components/Skeleton';
 
 const UserProfileBlock = () => {
 	const { user, isLoading, error } = useAuth();
-	const navigate = useNavigate();
-
-	const handleClick = () => {
-		navigate('/settings');
-	};
-
-	const getApiKeysStatus = () => {
-		if (!user) return 'error';
-		if (user.hasExtendedKeys && user.hasHyperliquidKeys) return 'success';
-		if (user.hasExtendedKeys || user.hasHyperliquidKeys) return 'warning';
-		return 'error';
-	};
 
 	const getBlockContent = () => {
 		if (isLoading) {

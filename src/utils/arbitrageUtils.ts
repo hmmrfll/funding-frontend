@@ -1,4 +1,4 @@
-import type { ArbitrageOpportunity } from '../service/arbitrageService';
+import type { ArbitrageOpportunity } from '../types/IArbitrage';
 import { navigateToPairDetails } from './navigationUtils';
 
 /**

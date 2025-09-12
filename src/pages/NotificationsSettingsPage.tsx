@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useBackButton } from '../hooks/useBackButton';
 import { navigateToCreateNotification, navigateBack } from '../utils/navigationUtils';
@@ -17,7 +17,7 @@ import {
 const NotificationsSettingsPage: React.FC = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
-	const { user, isAuthenticated } = useAuth();
+	const { user } = useAuth();
 	const { hapticTrigger } = useTelegram();
 	const [testNotificationSent, setTestNotificationSent] = useState(false);
 

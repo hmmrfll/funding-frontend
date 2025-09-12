@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useBackButton } from '../hooks/useBackButton';
 import { navigateBack, navigateToCreateNotification } from '../utils/navigationUtils';
@@ -15,7 +15,7 @@ const PairDetailsPage: React.FC = () => {
 	const { symbol } = useParams<{ symbol: string }>();
 	const navigate = useNavigate();
 	const location = useLocation();
-	const [showOpportunities, setShowOpportunities] = useState(false);
+	const [showOpportunities] = useState(false);
 
 	useBackButton(() => navigateBack(navigate));
 

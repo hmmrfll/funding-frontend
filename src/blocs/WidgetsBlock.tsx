@@ -7,7 +7,7 @@ import { useNotifications } from '../hooks/useQuery/useNotifications';
 
 const DashboardBlock = () => {
 	const navigate = useNavigate();
-	const { user, isAuthenticated } = useAuth();
+	const { user } = useAuth();
 
 	const { data: notifications = [], isLoading: notificationsLoading } = useNotifications(user?.id || '');
 
