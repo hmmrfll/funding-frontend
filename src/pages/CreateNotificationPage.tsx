@@ -4,7 +4,6 @@ import { useBackButton } from '../hooks/useBackButton';
 import { navigateBack } from '../utils/navigationUtils';
 import { fullScreenPaddingTop } from '../utils/isMobile';
 import SquircleWrap from '../components/SquircleWrap';
-import Input from '../components/inputs/Input';
 import Select from '../components/inputs/Select';
 import ActionCard from '../components/ActionCard';
 import { useAuth } from '../providers/AuthProvider';
@@ -174,17 +173,31 @@ const CreateNotificationPage: React.FC = () => {
 			<SquircleWrap className="bg-[var(--color-bg-secondary)] p-4">
 				<h3 className="font-tertiary-bold text-[var(--color-text)] mb-4">🎯 Profit Threshold</h3>
 
-				<Input
-					type="number"
-					step="0.001"
-					value={threshold}
+				<Select
+					value={threshold.toString()}
 					onChange={(e) => {
 						setThreshold(parseFloat(e.target.value) || 0);
 						hapticTrigger('soft');
 					}}
-					placeholder="0.01"
+					options={[
+						{ value: '0.0005', label: '0.05% - Ultra Low' },
+						{ value: '0.001', label: '0.1% - Very Low' },
+						{ value: '0.002', label: '0.2% - Low' },
+						{ value: '0.005', label: '0.5% - Low-Medium' },
+						{ value: '0.01', label: '1.0% - Default' },
+						{ value: '0.015', label: '1.5% - Medium-Low' },
+						{ value: '0.02', label: '2.0% - Medium' },
+						{ value: '0.025', label: '2.5% - Medium-High' },
+						{ value: '0.03', label: '3.0% - High-Low' },
+						{ value: '0.05', label: '5.0% - High' },
+						{ value: '0.075', label: '7.5% - Very High' },
+						{ value: '0.1', label: '10.0% - Very High' },
+						{ value: '0.15', label: '15.0% - Extreme' },
+						{ value: '0.2', label: '20.0% - Extreme' },
+						{ value: '0.25', label: '25.0% - Maximum' },
+						{ value: '0.5', label: '50.0% - Insane' },
+					]}
 					helperText={`Alert when profit reaches ${notificationsService.formatPercentage(threshold)} or higher`}
-					variant="number"
 				/>
 			</SquircleWrap>
 
